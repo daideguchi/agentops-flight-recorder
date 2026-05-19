@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AgentOps Flight Recorder</title>
+  <style>
+    body { margin: 0; background: #f5f7fb; color: #1f2937; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.5; }
+    main { max-width: 1120px; margin: 0 auto; padding: 32px 18px 56px; }
+    .hero, .panel { background: #fff; border: 1px solid #d8e0ea; border-radius: 8px; box-shadow: 0 16px 36px rgba(31,41,55,.08); }
+    .hero { padding: 30px; display: grid; grid-template-columns: minmax(0,1fr) minmax(300px,.7fr); gap: 24px; align-items: start; }
+    h1 { margin: 0 0 12px; font-size: clamp(34px, 5vw, 60px); line-height: 1.04; }
+    h2 { margin: 0 0 14px; font-size: 22px; }
+    p { margin: 0 0 14px; color: #475467; }
+    .badge { display: inline-flex; padding: 7px 10px; border-radius: 999px; background: #e8f5ec; color: #0b8043; font-weight: 700; font-size: 13px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+    a.button { display: inline-flex; padding: 11px 14px; border-radius: 7px; text-decoration: none; background: #0b8043; color: white; font-weight: 700; }
+    a.button.secondary { background: #eef2f7; color: #1f2937; }
+    video, img { width: 100%; border: 1px solid #d8e0ea; border-radius: 8px; background: white; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; margin-top: 18px; }
+    .panel { padding: 20px; margin-top: 18px; }
+    ul { margin: 0; padding-left: 20px; color: #475467; }
+    code { background: #eef2f7; border-radius: 4px; padding: 2px 5px; }
+    @media (max-width: 840px) { .hero, .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <div>
+        <span class="badge">Splunk Agentic Ops</span>
+        <h1>AgentOps Flight Recorder</h1>
+        <p>A Splunk-oriented black box for AI-agent operations, turning actions, risk, cost, approvals, and handoff points into searchable evidence.</p>
+        <div class="actions">
+          <a class="button" href="splunk-agentic-ops/prototype/flight-recorder-dashboard.html">Open Dashboard</a>
+          <a class="button secondary" href="shared-agentops-engine/web/index.html">Shared Timeline</a>
+          <a class="button secondary" href="SUBMISSION_PACKAGE.md">Submission Package</a>
+          <a class="button secondary" href="https://github.com/daideguchi/agentops-flight-recorder">GitHub</a>
+        </div>
+      </div>
+      <video controls muted poster="splunk-agentic-ops/media/flight-recorder-dashboard-full.png">
+        <source src="splunk-agentic-ops/media/agentops-flight-recorder-demo-draft.mp4" type="video/mp4">
+      </video>
+    </section>
+    <section class="panel">
+      <h2>What The Demo Shows</h2>
+      <ul>
+        <li>AI-agent activity becomes structured operational telemetry.</li>
+        <li>Risk, retry, cost, and approval events are searchable.</li>
+        <li>Teams can reconstruct what the agent did after an incident.</li>
+      </ul>
+    </section>
+    <section class="grid">
+      <a href="splunk-agentic-ops/prototype/flight-recorder-dashboard.html"><img src="splunk-agentic-ops/media/flight-recorder-dashboard-full.png" alt="Flight Recorder dashboard screenshot"></a>
+      <a href="shared-agentops-engine/web/index.html"><img src="shared-agentops-engine/media/shared-dashboard-full.png" alt="Shared AgentOps dashboard screenshot"></a>
+    </section>
+    <section class="panel">
+      <h2>Verify Locally</h2>
+      <p><code>cd shared-agentops-engine && python3 scripts/generate_portfolio_artifacts.py && python3 scripts/verify_artifacts.py</code></p>
+    </section>
+  </main>
+</body>
+</html>
