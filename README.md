@@ -6,6 +6,8 @@ AI agents now run scripts, call APIs, browse tools, update files, and make opera
 
 Submission package: [SUBMISSION_PACKAGE.md](SUBMISSION_PACKAGE.md)
 
+Live demo: https://daideguchi.github.io/agentops-flight-recorder/
+
 ## Demo
 
 ![AgentOps Flight Recorder dashboard](splunk-agentic-ops/media/flight-recorder-dashboard-full.png)
@@ -20,6 +22,10 @@ Open locally:
 
 - `splunk-agentic-ops/prototype/flight-recorder-dashboard.html`
 - `shared-agentops-engine/web/index.html`
+
+Open in browser:
+
+- https://daideguchi.github.io/agentops-flight-recorder/
 
 ## What It Shows
 

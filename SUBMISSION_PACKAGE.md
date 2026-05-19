@@ -12,9 +12,13 @@ A Splunk-oriented black box for AI-agent operations, turning actions, risk, cost
 
 https://github.com/daideguchi/agentops-flight-recorder
 
+## Live Demo
+
+https://daideguchi.github.io/agentops-flight-recorder/
+
 ## Try It Out
 
-Open these local demo files after cloning the repository:
+Open the live demo or these local demo files after cloning the repository:
 
 - `splunk-agentic-ops/prototype/flight-recorder-dashboard.html`
 - `shared-agentops-engine/web/index.html`
