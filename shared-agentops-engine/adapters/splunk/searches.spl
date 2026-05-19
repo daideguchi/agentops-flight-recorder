@@ -1,0 +1,19 @@
+# AgentOps Flight Recorder SPL Searches
+
+# Timeline by case
+index=agentops sourcetype="agentops:json"
+| sort 0 _time
+| table _time event.case_id event.event_id event.phase event.actor_type event.actor_name event.event_type event.status event.risk_level event.summary
+
+# High-risk or blocked actions
+index=agentops sourcetype="agentops:json" (event.risk_level="high" OR event.risk_level="critical" OR event.status="blocked")
+| table _time event.case_id event.event_id event.risk_level event.status event.risk_reason event.summary
+
+# Human approval queue
+index=agentops sourcetype="agentops:json" event.human_approval_required=true
+| table _time event.case_id event.event_id event.actor_name event.decision event.summary
+
+# Estimated model/tool cost by case
+index=agentops sourcetype="agentops:json"
+| stats sum(event.cost_usd_estimate) as estimated_cost by event.case_id
+| sort - estimated_cost

@@ -1,0 +1,186 @@
+{
+  "name": "Gemini Operations Navigator",
+  "hackathon": "Google Cloud Rapid Agent Hackathon",
+  "case_id": "CASE-CLOUD-003",
+  "goal": "Use Gemini and MCP tools to answer support questions under human-controlled cost and escalation guardrails.",
+  "mcp_tools": [
+    {
+      "name": "knowledge-base-mcp",
+      "purpose": "retrieve current policy source material",
+      "evidence": [
+        "evt-0022"
+      ]
+    },
+    {
+      "name": "ticketing-mcp",
+      "purpose": "create escalation task when uncertainty is high",
+      "evidence": []
+    },
+    {
+      "name": "cost-guardrail-mcp",
+      "purpose": "choose model tier and stop expensive loops",
+      "evidence": [
+        "evt-0024"
+      ]
+    }
+  ],
+  "human_control_points": [
+    "evt-0025"
+  ],
+  "risk_events": [
+    "evt-0024"
+  ],
+  "events": [
+    {
+      "event_id": "evt-0020",
+      "timestamp": "2026-05-19T12:13:40Z",
+      "session_id": "session-cloud-agent-workflow",
+      "task_id": "customer-support-knowledge-agent",
+      "case_id": "CASE-CLOUD-003",
+      "actor_type": "human",
+      "actor_name": "support-manager",
+      "phase": "intake",
+      "event_type": "task_start",
+      "status": "info",
+      "risk_level": "none",
+      "human_approval_required": false,
+      "decision": "none",
+      "summary": "Support manager requested an agent that answers customer questions and escalates uncertain cases.",
+      "evidence_ref": "evt-0020",
+      "metadata": {
+        "lane": "google,microsoft",
+        "target_user": "support_manager"
+      }
+    },
+    {
+      "event_id": "evt-0021",
+      "timestamp": "2026-05-19T12:14:21Z",
+      "session_id": "session-cloud-agent-workflow",
+      "task_id": "customer-support-knowledge-agent",
+      "case_id": "CASE-CLOUD-003",
+      "actor_type": "ai_agent",
+      "actor_name": "gemini-ops-navigator",
+      "phase": "planning",
+      "event_type": "plan_update",
+      "status": "success",
+      "risk_level": "low",
+      "human_approval_required": false,
+      "decision": "none",
+      "summary": "Agent created a workflow plan using retrieval, MCP tools, cost guardrails, and human escalation.",
+      "evidence_ref": "evt-0021",
+      "metadata": {
+        "mcp_tools": 3,
+        "guardrails": 4
+      }
+    },
+    {
+      "event_id": "evt-0022",
+      "timestamp": "2026-05-19T12:15:02Z",
+      "session_id": "session-cloud-agent-workflow",
+      "task_id": "customer-support-knowledge-agent",
+      "case_id": "CASE-CLOUD-003",
+      "actor_type": "api",
+      "actor_name": "knowledge-base-mcp",
+      "phase": "evidence_collection",
+      "event_type": "api_call",
+      "status": "success",
+      "risk_level": "low",
+      "human_approval_required": false,
+      "decision": "none",
+      "summary": "MCP retrieval returned the current refund policy and source URL for citation.",
+      "evidence_ref": "evt-0022",
+      "tool": "MCP server",
+      "action": "retrieve_policy",
+      "target": "refund-policy",
+      "duration_ms": 440,
+      "cost_usd_estimate": 0.001
+    },
+    {
+      "event_id": "evt-0023",
+      "timestamp": "2026-05-19T12:15:43Z",
+      "session_id": "session-cloud-agent-workflow",
+      "task_id": "customer-support-knowledge-agent",
+      "case_id": "CASE-CLOUD-003",
+      "actor_type": "ai_agent",
+      "actor_name": "gemini-ops-navigator",
+      "phase": "execution",
+      "event_type": "ai_call",
+      "status": "success",
+      "risk_level": "low",
+      "human_approval_required": false,
+      "decision": "none",
+      "summary": "Agent drafted a customer answer grounded in the retrieved refund policy.",
+      "evidence_ref": "evt-0023",
+      "tool": "Gemini",
+      "action": "draft_response",
+      "target": "customer refund question",
+      "duration_ms": 1980,
+      "cost_usd_estimate": 0.021,
+      "metadata": {
+        "citations": "evt-0022"
+      }
+    },
+    {
+      "event_id": "evt-0024",
+      "timestamp": "2026-05-19T12:16:24Z",
+      "session_id": "session-cloud-agent-workflow",
+      "task_id": "customer-support-knowledge-agent",
+      "case_id": "CASE-CLOUD-003",
+      "actor_type": "ai_agent",
+      "actor_name": "gemini-ops-navigator",
+      "phase": "risk_review",
+      "event_type": "cost_signal",
+      "status": "warning",
+      "risk_level": "medium",
+      "human_approval_required": false,
+      "decision": "none",
+      "summary": "Cost guardrail warned that the high-quality model should be reserved for escalations.",
+      "evidence_ref": "evt-0024",
+      "risk_reason": "Projected monthly model spend exceeded the manager's prototype budget.",
+      "cost_usd_estimate": 4.82,
+      "metadata": {
+        "monthly_projection_usd": 143.6
+      }
+    },
+    {
+      "event_id": "evt-0025",
+      "timestamp": "2026-05-19T12:17:05Z",
+      "session_id": "session-cloud-agent-workflow",
+      "task_id": "customer-support-knowledge-agent",
+      "case_id": "CASE-CLOUD-003",
+      "actor_type": "human",
+      "actor_name": "support-manager",
+      "phase": "approval",
+      "event_type": "approval_gate",
+      "status": "success",
+      "risk_level": "low",
+      "human_approval_required": true,
+      "decision": "approved",
+      "summary": "Human approved the workflow with a rule that expensive model calls are escalation-only.",
+      "evidence_ref": "evt-0025",
+      "metadata": {
+        "approved_budget_mode": "escalation_only"
+      }
+    },
+    {
+      "event_id": "evt-0026",
+      "timestamp": "2026-05-19T12:17:46Z",
+      "session_id": "session-cloud-agent-workflow",
+      "task_id": "customer-support-knowledge-agent",
+      "case_id": "CASE-CLOUD-003",
+      "actor_type": "system",
+      "actor_name": "agentops-recorder",
+      "phase": "handoff",
+      "event_type": "task_end",
+      "status": "success",
+      "risk_level": "none",
+      "human_approval_required": false,
+      "decision": "none",
+      "summary": "Closed cloud-agent workflow case with source citations, cost guardrail, and human approval captured.",
+      "evidence_ref": "evt-0026",
+      "metadata": {
+        "submission_lanes": "google,microsoft"
+      }
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/daideguchi/agentops-flight-recorder/schemas/agentops_event.schema.json",
+  "title": "AgentOps Flight Recorder Event",
+  "type": "object",
+  "required": [
+    "event_id",
+    "timestamp",
+    "session_id",
+    "task_id",
+    "actor_type",
+    "actor_name",
+    "phase",
+    "event_type",
+    "status",
+    "risk_level",
+    "human_approval_required",
+    "summary"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "event_id": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "task_id": {
+      "type": "string"
+    },
+    "actor_type": {
+      "type": "string",
+      "enum": ["human", "ai_agent", "system"]
+    },
+    "actor_name": {
+      "type": "string"
+    },
+    "phase": {
+      "type": "string",
+      "enum": ["intake", "planning", "investigation", "execution", "verification", "handoff", "submission"]
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "task_start",
+        "plan_update",
+        "tool_call",
+        "browser_action",
+        "file_change",
+        "approval_gate",
+        "ai_call",
+        "risk_signal",
+        "cost_signal",
+        "verification",
+        "task_end"
+      ]
+    },
+    "tool": {
+      "type": "string"
+    },
+    "action": {
+      "type": "string"
+    },
+    "target": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["success", "warning", "blocked", "failed", "info"]
+    },
+    "duration_ms": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "risk_level": {
+      "type": "string",
+      "enum": ["none", "low", "medium", "high", "critical"]
+    },
+    "risk_reason": {
+      "type": "string"
+    },
+    "cost_usd_estimate": {
+      "type": "number",
+      "minimum": 0
+    },
+    "human_approval_required": {
+      "type": "boolean"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "evidence_ref": {
+      "type": "string"
+    },
+    "redaction_applied": {
+      "type": "boolean"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": {
+        "type": ["string", "number", "boolean", "null"]
+      }
+    }
+  }
+}

@@ -1,0 +1,792 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Human-AI Operations Control Plane</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7f8;
+      --surface: #ffffff;
+      --muted: #637074;
+      --text: #172024;
+      --border: #d7dee2;
+      --brand: #0b6bcb;
+      --ok: #0f7b51;
+      --warn: #a05a00;
+      --danger: #b42318;
+      --critical: #6f1d1b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    header {
+      padding: 28px 32px 18px;
+      background: #102027;
+      color: white;
+      border-bottom: 1px solid #20333b;
+    }
+    header p { max-width: 920px; color: #c7d2d8; line-height: 1.55; }
+    h1 { margin: 0 0 10px; font-size: 34px; letter-spacing: 0; }
+    h2 { font-size: 20px; margin: 0 0 14px; }
+    h3 { margin: 0; font-size: 18px; }
+    p { line-height: 1.45; }
+    main { padding: 24px 32px 42px; }
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(120px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .metric {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      min-height: 86px;
+    }
+    .metric strong { display: block; font-size: 28px; margin-top: 8px; }
+    .metric span, .eyebrow, small { color: var(--muted); }
+    .case-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(240px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .workbench-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(300px, .8fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .stage-board, .approval-board, .adapter-board {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .stage-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(260px, 1fr));
+      gap: 10px;
+    }
+    .stage-card {
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: start;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fbfcfd;
+    }
+    .stage-index {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #eaf3ff;
+      color: var(--brand);
+      font-weight: 800;
+    }
+    .stage-card p {
+      margin: 6px 0 8px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .approval-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 10px;
+    }
+    .approval-list li {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fbfcfd;
+    }
+    .approval-list p {
+      margin: 6px 0 0;
+      color: #314046;
+      font-size: 14px;
+    }
+    .decision {
+      white-space: nowrap;
+      color: var(--brand);
+      font-weight: 800;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+    .adapter-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(120px, 1fr));
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .adapter-card {
+      display: block;
+      text-decoration: none;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .adapter-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+    .adapter-card strong {
+      display: block;
+      overflow-wrap: anywhere;
+    }
+    .case-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .case-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .eyebrow { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; }
+    .case-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin: 14px 0;
+    }
+    .case-metrics span {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px;
+      background: #fafbfc;
+      font-size: 13px;
+    }
+    .risk-list { margin: 0; padding-left: 18px; }
+    .risk-list li { margin: 8px 0; color: #314046; }
+    .risk-list span { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; margin-right: 6px; }
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    select {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 10px;
+      background: white;
+      color: var(--text);
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 11px 12px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+    th { font-size: 12px; color: var(--muted); text-transform: uppercase; background: #f8fafb; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .risk, .status {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid transparent;
+    }
+    .risk-none, .risk-low { color: var(--ok); background: #e8f5ef; border-color: #bce4d2; }
+    .risk-medium { color: var(--warn); background: #fff5df; border-color: #f5d38a; }
+    .risk-high { color: var(--danger); background: #fff0ed; border-color: #ffc9c0; }
+    .risk-critical { color: white; background: var(--critical); border-color: var(--critical); }
+    .status-success { color: var(--ok); background: #e8f5ef; }
+    .status-warning { color: var(--warn); background: #fff5df; }
+    .status-blocked, .status-failed { color: var(--danger); background: #fff0ed; }
+    .status-info { color: var(--brand); background: #eaf3ff; }
+    @media (max-width: 980px) {
+      .metric-grid, .case-grid { grid-template-columns: 1fr 1fr; }
+      .workbench-grid { grid-template-columns: 1fr; }
+      .adapter-grid { grid-template-columns: repeat(2, 1fr); }
+      table { font-size: 14px; }
+    }
+    @media (max-width: 680px) {
+      header, main { padding-left: 18px; padding-right: 18px; }
+      .metric-grid, .case-grid, .stage-grid, .adapter-grid { grid-template-columns: 1fr; }
+      th:nth-child(3), td:nth-child(3), th:nth-child(4), td:nth-child(4) { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Human-AI Operations Control Plane</h1>
+    <p>One event stream for humans, AI agents, robots, APIs, approvals, risks, costs, and evidence. This is the shared prototype behind the UiPath, Splunk, FIND EVIL, Google Cloud, and Microsoft hackathon lanes.</p>
+  </header>
+  <main>
+    <section class="metric-grid" aria-label="Metrics">
+      <div class="metric"><span>Events</span><strong>26</strong></div>
+      <div class="metric"><span>Cases</span><strong>3</strong></div>
+      <div class="metric"><span>Approvals</span><strong>5</strong></div>
+      <div class="metric"><span>Blocked</span><strong>1</strong></div>
+      <div class="metric"><span>High/Critical</span><strong>3</strong></div>
+      <div class="metric"><span>Est. Cost</span><strong>$4.86</strong></div>
+    </section>
+    <section class="workbench-grid" aria-label="UiPath case workbench">
+      <div class="stage-board">
+        <h2>UiPath Case Workbench</h2>
+        <div class="stage-grid">
+          
+            <article class="stage-card">
+              <div class="stage-index">1</div>
+              <div>
+                <h3>Intake</h3>
+                <p>Human opens the case</p>
+                <code>evt-0001</code>
+              </div>
+              <span class="risk risk-none">none</span>
+            </article>
+            
+
+            <article class="stage-card">
+              <div class="stage-index">2</div>
+              <div>
+                <h3>Agent Investigation</h3>
+                <p>AI agent plans and tests read-only</p>
+                <code>evt-0002, evt-0005</code>
+              </div>
+              <span class="risk risk-medium">medium</span>
+            </article>
+            
+
+            <article class="stage-card">
+              <div class="stage-index">3</div>
+              <div>
+                <h3>Robot Evidence</h3>
+                <p>UiPath robot and APIs gather records</p>
+                <code>evt-0003, evt-0004, evt-0009</code>
+              </div>
+              <span class="risk risk-low">low</span>
+            </article>
+            
+
+            <article class="stage-card">
+              <div class="stage-index">4</div>
+              <div>
+                <h3>Risk Review</h3>
+                <p>Control plane escalates and blocks risk</p>
+                <code>evt-0006, evt-0007</code>
+              </div>
+              <span class="risk risk-critical">critical</span>
+            </article>
+            
+
+            <article class="stage-card">
+              <div class="stage-index">5</div>
+              <div>
+                <h3>Human Approval</h3>
+                <p>Humans ask for evidence and reject release</p>
+                <code>evt-0008, evt-0010</code>
+              </div>
+              <span class="risk risk-medium">medium</span>
+            </article>
+            
+
+            <article class="stage-card">
+              <div class="stage-index">6</div>
+              <div>
+                <h3>Handoff</h3>
+                <p>Report is generated from evidence IDs</p>
+                <code>evt-0011</code>
+              </div>
+              <span class="risk risk-none">none</span>
+            </article>
+            
+        </div>
+      </div>
+      <aside class="approval-board">
+        <h2>Human Approval Queue</h2>
+        <ul class="approval-list">
+          
+            <li>
+              <div>
+                <code>evt-0007</code>
+                <strong>codex-ops-agent</strong>
+                <p>Attempted production deployment was blocked by policy before execution.</p>
+              </div>
+              <span class="decision">blocked by policy</span>
+            </li>
+            
+
+            <li>
+              <div>
+                <code>evt-0008</code>
+                <strong>operations-lead</strong>
+                <p>Human requested more evidence instead of approving the production deployment.</p>
+              </div>
+              <span class="decision">needs more evidence</span>
+            </li>
+            
+
+            <li>
+              <div>
+                <code>evt-0010</code>
+                <strong>service-owner</strong>
+                <p>Service owner rejected the release until the retry regression is fixed.</p>
+              </div>
+              <span class="decision">rejected</span>
+            </li>
+            
+
+            <li>
+              <div>
+                <code>evt-0018</code>
+                <strong>security-analyst</strong>
+                <p>Human approved containment of the reported message and requested no endpoint isolation.</p>
+              </div>
+              <span class="decision">approved</span>
+            </li>
+            
+
+            <li>
+              <div>
+                <code>evt-0025</code>
+                <strong>support-manager</strong>
+                <p>Human approved the workflow with a rule that expensive model calls are escalation-only.</p>
+              </div>
+              <span class="decision">approved</span>
+            </li>
+            
+        </ul>
+      </aside>
+    </section>
+    <section aria-label="Adapter outputs">
+      <h2>Contest Adapters</h2>
+      <div class="adapter-grid">
+        
+        <a class="adapter-card" href="../adapters/uipath/case_packet.json">
+          <span>UiPath</span>
+          <strong>case_packet.json</strong>
+        </a>
+        
+
+        <a class="adapter-card" href="../adapters/splunk/hec_events.jsonl">
+          <span>Splunk</span>
+          <strong>hec_events.jsonl</strong>
+        </a>
+        
+
+        <a class="adapter-card" href="../adapters/findevil/dfir_report.md">
+          <span>FIND EVIL</span>
+          <strong>dfir_report.md</strong>
+        </a>
+        
+
+        <a class="adapter-card" href="../adapters/google/gemini_mcp_workflow.json">
+          <span>Google</span>
+          <strong>gemini_mcp_workflow.json</strong>
+        </a>
+        
+
+        <a class="adapter-card" href="../adapters/microsoft/copilot_architecture.md">
+          <span>Microsoft</span>
+          <strong>copilot_architecture.md</strong>
+        </a>
+        
+      </div>
+    </section>
+    <section class="case-grid" aria-label="Cases">
+      
+            <article class="case-card">
+              <div class="case-head">
+                <div>
+                  <p class="eyebrow">CASE-AI-OPS-001</p>
+                  <h3>AI Agent Operations Exception Review</h3>
+                </div>
+                <span class="risk risk-critical">critical</span>
+              </div>
+              <div class="case-metrics">
+                <span>11 events</span>
+                <span>3 approvals</span>
+                <span>1 blocked</span>
+                <span>$0.006</span>
+              </div>
+              <ol class="risk-list"><li><span>evt-0005</span>Regression test failed around duplicate retry suppression.</li><li><span>evt-0006</span>Production payment behavior change plus failing regression test.</li><li><span>evt-0007</span>Production deployment is destructive and requires human approval.</li><li><span>evt-0008</span>Human requested more evidence instead of approving the production deployment.</li></ol>
+            </article>
+            
+
+            <article class="case-card">
+              <div class="case-head">
+                <div>
+                  <p class="eyebrow">CASE-DFIR-002</p>
+                  <h3>Evidence-Locked Phishing Investigation</h3>
+                </div>
+                <span class="risk risk-high">high</span>
+              </div>
+              <div class="case-metrics">
+                <span>8 events</span>
+                <span>1 approvals</span>
+                <span>0 blocked</span>
+                <span>$0.012</span>
+              </div>
+              <ol class="risk-list"><li><span>evt-0015</span>Initial model answer overclaimed malware execution before process evidence was present.</li><li><span>evt-0016</span>Unsupported certainty detected in analyst draft.</li><li><span>evt-0017</span>Hash lookup returned low-confidence phishing kit association; raw indicator was redacted in report output.</li></ol>
+            </article>
+            
+
+            <article class="case-card">
+              <div class="case-head">
+                <div>
+                  <p class="eyebrow">CASE-CLOUD-003</p>
+                  <h3>Human-Controlled Cloud Agent Workflow</h3>
+                </div>
+                <span class="risk risk-medium">medium</span>
+              </div>
+              <div class="case-metrics">
+                <span>7 events</span>
+                <span>1 approvals</span>
+                <span>0 blocked</span>
+                <span>$4.842</span>
+              </div>
+              <ol class="risk-list"><li><span>evt-0024</span>Projected monthly model spend exceeded the manager&#x27;s prototype budget.</li></ol>
+            </article>
+            
+    </section>
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Event Timeline</h2>
+        <label>Case
+          <select id="caseFilter">
+            <option value="all">All cases</option>
+            <option value="CASE-AI-OPS-001">CASE-AI-OPS-001</option><option value="CASE-DFIR-002">CASE-DFIR-002</option><option value="CASE-CLOUD-003">CASE-CLOUD-003</option>
+          </select>
+        </label>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Event</th>
+            <th>Phase</th>
+            <th>Actor</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Risk</th>
+            <th>Summary</th>
+          </tr>
+        </thead>
+        <tbody id="timelineBody">
+          
+            <tr data-case="CASE-AI-OPS-001" data-risk="none">
+              <td><code>evt-0001</code></td>
+              <td>intake</td>
+              <td>human<br><small>operations-lead</small></td>
+              <td>task_start</td>
+              <td><span class="status status-info">info</span></td>
+              <td><span class="risk risk-none">none</span></td>
+              <td>Human opened an AI-agent operations case after a release bot proposed a production change.</td>
+            </tr>
+            
+
+            <tr data-case="CASE-AI-OPS-001" data-risk="low">
+              <td><code>evt-0002</code></td>
+              <td>planning</td>
+              <td>ai_agent<br><small>codex-ops-agent</small></td>
+              <td>plan_update</td>
+              <td><span class="status status-success">success</span></td>
+              <td><span class="risk risk-low">low</span></td>
+              <td>Agent created a read-only investigation plan with explicit approval gates before any production action.</td>
+            </tr>
+            
+
+            <tr data-case="CASE-AI-OPS-001" data-risk="low">
+              <td><code>evt-0003</code></td>
+              <td>evidence_collection</td>
+              <td>robot<br><small>uipath-evidence-robot</small></td>
+              <td>robot_task</td>
+              <td><span class="status status-success">success</span></td>
+              <td><span class="risk risk-low">low</span></td>
+              <td>Robot gathered the change ticket, linked pull request, deployment window, and service owner.</td>
+            </tr>
+            
+
+            <tr data-case="CASE-AI-OPS-001" data-risk="low">
+              <td><code>evt-0004</code></td>
+              <td>evidence_collection</td>
+              <td>api<br><small>github-api</small></td>
+              <td>api_call</td>
+              <td><span class="status status-success">success</span></td>
+              <td><span class="risk risk-low">low</span></td>
+              <td>API confirmed the pull request touches payment retry behavior and has one approving review.</td>
+            </tr>
+            
+
+            <tr data-case="CASE-AI-OPS-001" data-risk="medium">
+              <td><code>evt-0005</code></td>
+              <td>investigation</td>
+              <td>ai_agent<br><small>codex-ops-agent</small></td>
+              <td>tool_call</td>
+              <td><span class="status status-failed">failed</span></td>
+              <td><span class="risk risk-medium">medium</span></td>
+              <td>Agent found a failing retry regression test that was not mentioned in the change ticket.</td>
+            </tr>
+            
+
+            <tr data-case="CASE-AI-OPS-001" data-risk="high">
+              <td><code>evt-0006</code></td>
+              <td>risk_review</td>
+              <td>ai_agent<br><small>codex-ops-agent</small></td>
+              <td>risk_signal</td>
+              <td><span class="status status-warning">warning</span></td>
+              <td><span class="risk risk-high">high</span></td>
+              <td>Case risk escalated because the proposed release affects payments and has failing verification.</td>
+            </tr>
+            
+
+            <tr data-case="CASE-AI-OPS-001" data-risk="critical">
+              <td><code>evt-0007</code></td>
+              <td>execution</td>
+              <td>ai_agent<br><small>codex-ops-agent</small></td>
+              <td>tool_call</td>
+              <td><span class="status status-blocked">blocked</span></td>
+              <td><span class="risk risk-critical">critical</span></td>
+              <td>Attempted production deployment was blocked by policy before execution.</td>
+            </tr>
+            
+
+            <tr data-case="CASE-AI-OPS-001" data-risk="medium">
+              <td><code>evt-0008</code></td>
+              <td>approval</td>
+              <td>human<br><small>operations-lead</small></td>
+              <td>approval_gate</td>
+              <td><span class="status status-success">success</span></td>
+              <td><span class="risk risk-medium">medium</span></td>
+              <td>Human requested more evidence instead of approving the production deployment.</td>
+            </tr>
+            
+
+            <tr data-case="CASE-AI-OPS-001" data-risk="low">
+              <td><code>evt-0009</code></td>
+              <td>evidence_collection</td>
+              <td>robot<br><small>uipath-evidence-robot</small></td>
+              <td>robot_task</td>
+              <td><span class="status status-success">success</span></td>
+              <td><span class="risk risk-low">low</span></td>
+              <td>Robot requested service-owner signoff and attached the failed test evidence.</td>
+            </tr>
+            
+
+            <tr data-case="CASE-AI-OPS-001" data-risk="low">
+              <td><code>evt-0010</code></td>
+              <td>approval</td>
+              <td>human<br><small>service-owner</small></td>
+              <td>approval_gate</td>
+              <td><span class="status status-success">success</span></td>
+              <td><span class="risk risk-low">low</span></td>
+              <td>Service owner rejected the release until the retry regression is fixed.</td>
+            </tr>
+            
+
+            <tr data-case="CASE-AI-OPS-001" data-risk="none">
+              <td><code>evt-0011</code></td>
+              <td>handoff</td>
+              <td>system<br><small>agentops-recorder</small></td>
+              <td>handoff_report</td>
+              <td><span class="status status-success">success</span></td>
+              <td><span class="risk risk-none">none</span></td>
+              <td>Generated a case handoff report with cited evidence IDs and final rejection decision.</td>
+            </tr>
+            
+
+            <tr data-case="CASE-DFIR-002" data-risk="none">
+              <td><code>evt-0012</code></td>
+              <td>intake</td>
+              <td>human<br><small>security-analyst</small></td>
+              <td>task_start</td>
+              <td><span class="status status-info">info</span></td>
+              <td><span class="risk risk-none">none</span></td>
+              <td>Security analyst opened a suspicious email investigation with attached endpoint telemetry.</td>
+            </tr>
+            
+
+            <tr data-case="CASE-DFIR-002" data-risk="low">
+              <td><code>evt-0013</code></td>
+              <td>planning</td>
+              <td>ai_agent<br><small>dfir-analysis-agent</small></td>
+              <td>plan_update</td>
+              <td><span class="status status-success">success</span></td>
+              <td><span class="risk risk-low">low</span></td>
+              <td>Agent proposed an evidence-first DFIR plan: preserve artifacts, list hypotheses, then verify each claim.</td>
+            </tr>
+            
+
+            <tr data-case="CASE-DFIR-002" data-risk="low">
+              <td><code>evt-0014</code></td>
+              <td>evidence_collection</td>
+              <td>robot<br><small>sift-collector</small></td>
+              <td>evidence_captured</td>
+              <td><span class="status status-success">success</span></td>
+              <td><span class="risk risk-low">low</span></td>
+              <td>Collected email headers, attachment hash, browser download timeline, and endpoint process list.</td>
+            </tr>
+            
+
+            <tr data-case="CASE-DFIR-002" data-risk="medium">
+              <td><code>evt-0015</code></td>
+              <td>investigation</td>
+              <td>ai_agent<br><small>dfir-analysis-agent</small></td>
+              <td>ai_call</td>
+              <td><span class="status status-warning">warning</span></td>
+              <td><span class="risk risk-medium">medium</span></td>
+              <td>Agent generated an initial hypothesis but flagged one claim as unsupported by current evidence.</td>
+            </tr>
+            
+
+            <tr data-case="CASE-DFIR-002" data-risk="high">
+              <td><code>evt-0016</code></td>
+              <td>risk_review</td>
+              <td>ai_agent<br><small>dfir-analysis-agent</small></td>
+              <td>risk_signal</td>
+              <td><span class="status status-warning">warning</span></td>
+              <td><span class="risk risk-high">high</span></td>
+              <td>System marked the draft finding as provisional because execution evidence was missing.</td>
+            </tr>
+            
+
+            <tr data-case="CASE-DFIR-002" data-risk="medium">
+              <td><code>evt-0017</code></td>
+              <td>evidence_collection</td>
+              <td>api<br><small>threat-intel-api</small></td>
+              <td>api_call</td>
+              <td><span class="status status-success">success</span></td>
+              <td><span class="risk risk-medium">medium</span></td>
+              <td>Hash lookup returned low-confidence phishing kit association; raw indicator was redacted in report output.</td>
+            </tr>
+            
+
+            <tr data-case="CASE-DFIR-002" data-risk="low">
+              <td><code>evt-0018</code></td>
+              <td>approval</td>
+              <td>human<br><small>security-analyst</small></td>
+              <td>approval_gate</td>
+              <td><span class="status status-success">success</span></td>
+              <td><span class="risk risk-low">low</span></td>
+              <td>Human approved containment of the reported message and requested no endpoint isolation.</td>
+            </tr>
+            
+
+            <tr data-case="CASE-DFIR-002" data-risk="none">
+              <td><code>evt-0019</code></td>
+              <td>handoff</td>
+              <td>system<br><small>agentops-recorder</small></td>
+              <td>handoff_report</td>
+              <td><span class="status status-success">success</span></td>
+              <td><span class="risk risk-none">none</span></td>
+              <td>Generated DFIR report with evidence IDs, unsupported claims, and human containment decision.</td>
+            </tr>
+            
+
+            <tr data-case="CASE-CLOUD-003" data-risk="none">
+              <td><code>evt-0020</code></td>
+              <td>intake</td>
+              <td>human<br><small>support-manager</small></td>
+              <td>task_start</td>
+              <td><span class="status status-info">info</span></td>
+              <td><span class="risk risk-none">none</span></td>
+              <td>Support manager requested an agent that answers customer questions and escalates uncertain cases.</td>
+            </tr>
+            
+
+            <tr data-case="CASE-CLOUD-003" data-risk="low">
+              <td><code>evt-0021</code></td>
+              <td>planning</td>
+              <td>ai_agent<br><small>gemini-ops-navigator</small></td>
+              <td>plan_update</td>
+              <td><span class="status status-success">success</span></td>
+              <td><span class="risk risk-low">low</span></td>
+              <td>Agent created a workflow plan using retrieval, MCP tools, cost guardrails, and human escalation.</td>
+            </tr>
+            
+
+            <tr data-case="CASE-CLOUD-003" data-risk="low">
+              <td><code>evt-0022</code></td>
+              <td>evidence_collection</td>
+              <td>api<br><small>knowledge-base-mcp</small></td>
+              <td>api_call</td>
+              <td><span class="status status-success">success</span></td>
+              <td><span class="risk risk-low">low</span></td>
+              <td>MCP retrieval returned the current refund policy and source URL for citation.</td>
+            </tr>
+            
+
+            <tr data-case="CASE-CLOUD-003" data-risk="low">
+              <td><code>evt-0023</code></td>
+              <td>execution</td>
+              <td>ai_agent<br><small>gemini-ops-navigator</small></td>
+              <td>ai_call</td>
+              <td><span class="status status-success">success</span></td>
+              <td><span class="risk risk-low">low</span></td>
+              <td>Agent drafted a customer answer grounded in the retrieved refund policy.</td>
+            </tr>
+            
+
+            <tr data-case="CASE-CLOUD-003" data-risk="medium">
+              <td><code>evt-0024</code></td>
+              <td>risk_review</td>
+              <td>ai_agent<br><small>gemini-ops-navigator</small></td>
+              <td>cost_signal</td>
+              <td><span class="status status-warning">warning</span></td>
+              <td><span class="risk risk-medium">medium</span></td>
+              <td>Cost guardrail warned that the high-quality model should be reserved for escalations.</td>
+            </tr>
+            
+
+            <tr data-case="CASE-CLOUD-003" data-risk="low">
+              <td><code>evt-0025</code></td>
+              <td>approval</td>
+              <td>human<br><small>support-manager</small></td>
+              <td>approval_gate</td>
+              <td><span class="status status-success">success</span></td>
+              <td><span class="risk risk-low">low</span></td>
+              <td>Human approved the workflow with a rule that expensive model calls are escalation-only.</td>
+            </tr>
+            
+
+            <tr data-case="CASE-CLOUD-003" data-risk="none">
+              <td><code>evt-0026</code></td>
+              <td>handoff</td>
+              <td>system<br><small>agentops-recorder</small></td>
+              <td>task_end</td>
+              <td><span class="status status-success">success</span></td>
+              <td><span class="risk risk-none">none</span></td>
+              <td>Closed cloud-agent workflow case with source citations, cost guardrail, and human approval captured.</td>
+            </tr>
+            
+        </tbody>
+      </table>
+    </section>
+  </main>
+  <script id="events-json" type="application/json">[{"event_id": "evt-0001", "timestamp": "2026-05-19T12:00:41Z", "session_id": "session-ai-ops-release-risk", "task_id": "release-risk-review", "case_id": "CASE-AI-OPS-001", "actor_type": "human", "actor_name": "operations-lead", "phase": "intake", "event_type": "task_start", "status": "info", "risk_level": "none", "human_approval_required": false, "decision": "none", "summary": "Human opened an AI-agent operations case after a release bot proposed a production change.", "evidence_ref": "evt-0001", "metadata": {"lane": "uipath", "business_process": "release_exception_review"}}, {"event_id": "evt-0002", "timestamp": "2026-05-19T12:01:22Z", "session_id": "session-ai-ops-release-risk", "task_id": "release-risk-review", "case_id": "CASE-AI-OPS-001", "actor_type": "ai_agent", "actor_name": "codex-ops-agent", "phase": "planning", "event_type": "plan_update", "status": "success", "risk_level": "low", "human_approval_required": false, "decision": "none", "summary": "Agent created a read-only investigation plan with explicit approval gates before any production action.", "evidence_ref": "evt-0002", "metadata": {"plan_steps": 5, "approval_gates": 2}}, {"event_id": "evt-0003", "timestamp": "2026-05-19T12:02:03Z", "session_id": "session-ai-ops-release-risk", "task_id": "release-risk-review", "case_id": "CASE-AI-OPS-001", "actor_type": "robot", "actor_name": "uipath-evidence-robot", "phase": "evidence_collection", "event_type": "robot_task", "status": "success", "risk_level": "low", "human_approval_required": false, "decision": "none", "summary": "Robot gathered the change ticket, linked pull request, deployment window, and service owner.", "evidence_ref": "evt-0003", "tool": "UiPath Robot", "action": "collect_release_context", "target": "change-ticket-7841", "duration_ms": 4800, "metadata": {"records_collected": 4}}, {"event_id": "evt-0004", "timestamp": "2026-05-19T12:02:44Z", "session_id": "session-ai-ops-release-risk", "task_id": "release-risk-review", "case_id": "CASE-AI-OPS-001", "actor_type": "api", "actor_name": "github-api", "phase": "evidence_collection", "event_type": "api_call", "status": "success", "risk_level": "low", "human_approval_required": false, "decision": "none", "summary": "API confirmed the pull request touches payment retry behavior and has one approving review.", "evidence_ref": "evt-0004", "tool": "GitHub API", "action": "read_pull_request", "target": "payments-service/pull/221", "duration_ms": 970, "cost_usd_estimate": 0, "metadata": {"files_changed": 8, "approvals": 1}}, {"event_id": "evt-0005", "timestamp": "2026-05-19T12:03:25Z", "session_id": "session-ai-ops-release-risk", "task_id": "release-risk-review", "case_id": "CASE-AI-OPS-001", "actor_type": "ai_agent", "actor_name": "codex-ops-agent", "phase": "investigation", "event_type": "tool_call", "status": "failed", "risk_level": "medium", "human_approval_required": false, "decision": "none", "summary": "Agent found a failing retry regression test that was not mentioned in the change ticket.", "evidence_ref": "evt-0005", "tool": "shell", "action": "run_tests", "target": "payments-service retry tests", "duration_ms": 53200, "risk_reason": "Regression test failed around duplicate retry suppression.", "cost_usd_estimate": 0.006}, {"event_id": "evt-0006", "timestamp": "2026-05-19T12:04:06Z", "session_id": "session-ai-ops-release-risk", "task_id": "release-risk-review", "case_id": "CASE-AI-OPS-001", "actor_type": "ai_agent", "actor_name": "codex-ops-agent", "phase": "risk_review", "event_type": "risk_signal", "status": "warning", "risk_level": "high", "human_approval_required": false, "decision": "none", "summary": "Case risk escalated because the proposed release affects payments and has failing verification.", "evidence_ref": "evt-0006", "risk_reason": "Production payment behavior change plus failing regression test.", "metadata": {"risk_rule": "payment_change_failed_test"}}, {"event_id": "evt-0007", "timestamp": "2026-05-19T12:04:47Z", "session_id": "session-ai-ops-release-risk", "task_id": "release-risk-review", "case_id": "CASE-AI-OPS-001", "actor_type": "ai_agent", "actor_name": "codex-ops-agent", "phase": "execution", "event_type": "tool_call", "status": "blocked", "risk_level": "critical", "human_approval_required": true, "decision": "blocked_by_policy", "summary": "Attempted production deployment was blocked by policy before execution.", "evidence_ref": "evt-0007", "tool": "shell", "action": "deploy", "target": "production/payments-service", "duration_ms": 120, "risk_reason": "Production deployment is destructive and requires human approval.", "metadata": {"command_class": "production_deploy"}}, {"event_id": "evt-0008", "timestamp": "2026-05-19T12:05:28Z", "session_id": "session-ai-ops-release-risk", "task_id": "release-risk-review", "case_id": "CASE-AI-OPS-001", "actor_type": "human", "actor_name": "operations-lead", "phase": "approval", "event_type": "approval_gate", "status": "success", "risk_level": "medium", "human_approval_required": true, "decision": "needs_more_evidence", "summary": "Human requested more evidence instead of approving the production deployment.", "evidence_ref": "evt-0008", "metadata": {"requested": "service_owner_signoff"}}, {"event_id": "evt-0009", "timestamp": "2026-05-19T12:06:09Z", "session_id": "session-ai-ops-release-risk", "task_id": "release-risk-review", "case_id": "CASE-AI-OPS-001", "actor_type": "robot", "actor_name": "uipath-evidence-robot", "phase": "evidence_collection", "event_type": "robot_task", "status": "success", "risk_level": "low", "human_approval_required": false, "decision": "none", "summary": "Robot requested service-owner signoff and attached the failed test evidence.", "evidence_ref": "evt-0009", "tool": "UiPath Robot", "action": "request_owner_signoff", "target": "payments-service owner", "duration_ms": 8200, "metadata": {"notification_channel": "case_queue"}}, {"event_id": "evt-0010", "timestamp": "2026-05-19T12:06:50Z", "session_id": "session-ai-ops-release-risk", "task_id": "release-risk-review", "case_id": "CASE-AI-OPS-001", "actor_type": "human", "actor_name": "service-owner", "phase": "approval", "event_type": "approval_gate", "status": "success", "risk_level": "low", "human_approval_required": true, "decision": "rejected", "summary": "Service owner rejected the release until the retry regression is fixed.", "evidence_ref": "evt-0010", "metadata": {"release_decision": "hold"}}, {"event_id": "evt-0011", "timestamp": "2026-05-19T12:07:31Z", "session_id": "session-ai-ops-release-risk", "task_id": "release-risk-review", "case_id": "CASE-AI-OPS-001", "actor_type": "system", "actor_name": "agentops-recorder", "phase": "handoff", "event_type": "handoff_report", "status": "success", "risk_level": "none", "human_approval_required": false, "decision": "none", "summary": "Generated a case handoff report with cited evidence IDs and final rejection decision.", "evidence_ref": "evt-0011", "metadata": {"cited_events": "evt-0003,evt-0004,evt-0005,evt-0006,evt-0007,evt-0010"}}, {"event_id": "evt-0012", "timestamp": "2026-05-19T12:08:12Z", "session_id": "session-dfir-phishing-response", "task_id": "phishing-triage", "case_id": "CASE-DFIR-002", "actor_type": "human", "actor_name": "security-analyst", "phase": "intake", "event_type": "task_start", "status": "info", "risk_level": "none", "human_approval_required": false, "decision": "none", "summary": "Security analyst opened a suspicious email investigation with attached endpoint telemetry.", "evidence_ref": "evt-0012", "metadata": {"lane": "findevil", "source": "user_reported_email"}}, {"event_id": "evt-0013", "timestamp": "2026-05-19T12:08:53Z", "session_id": "session-dfir-phishing-response", "task_id": "phishing-triage", "case_id": "CASE-DFIR-002", "actor_type": "ai_agent", "actor_name": "dfir-analysis-agent", "phase": "planning", "event_type": "plan_update", "status": "success", "risk_level": "low", "human_approval_required": false, "decision": "none", "summary": "Agent proposed an evidence-first DFIR plan: preserve artifacts, list hypotheses, then verify each claim.", "evidence_ref": "evt-0013", "metadata": {"hypotheses": 3}}, {"event_id": "evt-0014", "timestamp": "2026-05-19T12:09:34Z", "session_id": "session-dfir-phishing-response", "task_id": "phishing-triage", "case_id": "CASE-DFIR-002", "actor_type": "robot", "actor_name": "sift-collector", "phase": "evidence_collection", "event_type": "evidence_captured", "status": "success", "risk_level": "low", "human_approval_required": false, "decision": "none", "summary": "Collected email headers, attachment hash, browser download timeline, and endpoint process list.", "evidence_ref": "evt-0014", "tool": "SIFT workstation", "action": "capture_artifacts", "target": "mailbox and endpoint timeline", "duration_ms": 12300, "metadata": {"artifacts": "headers,hash,timeline,processes"}}, {"event_id": "evt-0015", "timestamp": "2026-05-19T12:10:15Z", "session_id": "session-dfir-phishing-response", "task_id": "phishing-triage", "case_id": "CASE-DFIR-002", "actor_type": "ai_agent", "actor_name": "dfir-analysis-agent", "phase": "investigation", "event_type": "ai_call", "status": "warning", "risk_level": "medium", "human_approval_required": false, "decision": "none", "summary": "Agent generated an initial hypothesis but flagged one claim as unsupported by current evidence.", "evidence_ref": "evt-0015", "tool": "LLM", "action": "classify_evidence", "target": "artifact packet", "duration_ms": 2210, "risk_reason": "Initial model answer overclaimed malware execution before process evidence was present.", "cost_usd_estimate": 0.012}, {"event_id": "evt-0016", "timestamp": "2026-05-19T12:10:56Z", "session_id": "session-dfir-phishing-response", "task_id": "phishing-triage", "case_id": "CASE-DFIR-002", "actor_type": "ai_agent", "actor_name": "dfir-analysis-agent", "phase": "risk_review", "event_type": "risk_signal", "status": "warning", "risk_level": "high", "human_approval_required": false, "decision": "none", "summary": "System marked the draft finding as provisional because execution evidence was missing.", "evidence_ref": "evt-0016", "risk_reason": "Unsupported certainty detected in analyst draft.", "metadata": {"self_correction": true}}, {"event_id": "evt-0017", "timestamp": "2026-05-19T12:11:37Z", "session_id": "session-dfir-phishing-response", "task_id": "phishing-triage", "case_id": "CASE-DFIR-002", "actor_type": "api", "actor_name": "threat-intel-api", "phase": "evidence_collection", "event_type": "api_call", "status": "success", "risk_level": "medium", "human_approval_required": false, "decision": "none", "summary": "Hash lookup returned low-confidence phishing kit association; raw indicator was redacted in report output.", "evidence_ref": "evt-0017", "tool": "Threat Intel API", "action": "lookup_hash", "target": "sha256:9f2c-redacted", "duration_ms": 780, "redaction_applied": true, "metadata": {"confidence": "low"}}, {"event_id": "evt-0018", "timestamp": "2026-05-19T12:12:18Z", "session_id": "session-dfir-phishing-response", "task_id": "phishing-triage", "case_id": "CASE-DFIR-002", "actor_type": "human", "actor_name": "security-analyst", "phase": "approval", "event_type": "approval_gate", "status": "success", "risk_level": "low", "human_approval_required": true, "decision": "approved", "summary": "Human approved containment of the reported message and requested no endpoint isolation.", "evidence_ref": "evt-0018", "metadata": {"containment": "mailbox_only"}}, {"event_id": "evt-0019", "timestamp": "2026-05-19T12:12:59Z", "session_id": "session-dfir-phishing-response", "task_id": "phishing-triage", "case_id": "CASE-DFIR-002", "actor_type": "system", "actor_name": "agentops-recorder", "phase": "handoff", "event_type": "handoff_report", "status": "success", "risk_level": "none", "human_approval_required": false, "decision": "none", "summary": "Generated DFIR report with evidence IDs, unsupported claims, and human containment decision.", "evidence_ref": "evt-0019", "metadata": {"report_type": "dfir"}}, {"event_id": "evt-0020", "timestamp": "2026-05-19T12:13:40Z", "session_id": "session-cloud-agent-workflow", "task_id": "customer-support-knowledge-agent", "case_id": "CASE-CLOUD-003", "actor_type": "human", "actor_name": "support-manager", "phase": "intake", "event_type": "task_start", "status": "info", "risk_level": "none", "human_approval_required": false, "decision": "none", "summary": "Support manager requested an agent that answers customer questions and escalates uncertain cases.", "evidence_ref": "evt-0020", "metadata": {"lane": "google,microsoft", "target_user": "support_manager"}}, {"event_id": "evt-0021", "timestamp": "2026-05-19T12:14:21Z", "session_id": "session-cloud-agent-workflow", "task_id": "customer-support-knowledge-agent", "case_id": "CASE-CLOUD-003", "actor_type": "ai_agent", "actor_name": "gemini-ops-navigator", "phase": "planning", "event_type": "plan_update", "status": "success", "risk_level": "low", "human_approval_required": false, "decision": "none", "summary": "Agent created a workflow plan using retrieval, MCP tools, cost guardrails, and human escalation.", "evidence_ref": "evt-0021", "metadata": {"mcp_tools": 3, "guardrails": 4}}, {"event_id": "evt-0022", "timestamp": "2026-05-19T12:15:02Z", "session_id": "session-cloud-agent-workflow", "task_id": "customer-support-knowledge-agent", "case_id": "CASE-CLOUD-003", "actor_type": "api", "actor_name": "knowledge-base-mcp", "phase": "evidence_collection", "event_type": "api_call", "status": "success", "risk_level": "low", "human_approval_required": false, "decision": "none", "summary": "MCP retrieval returned the current refund policy and source URL for citation.", "evidence_ref": "evt-0022", "tool": "MCP server", "action": "retrieve_policy", "target": "refund-policy", "duration_ms": 440, "cost_usd_estimate": 0.001}, {"event_id": "evt-0023", "timestamp": "2026-05-19T12:15:43Z", "session_id": "session-cloud-agent-workflow", "task_id": "customer-support-knowledge-agent", "case_id": "CASE-CLOUD-003", "actor_type": "ai_agent", "actor_name": "gemini-ops-navigator", "phase": "execution", "event_type": "ai_call", "status": "success", "risk_level": "low", "human_approval_required": false, "decision": "none", "summary": "Agent drafted a customer answer grounded in the retrieved refund policy.", "evidence_ref": "evt-0023", "tool": "Gemini", "action": "draft_response", "target": "customer refund question", "duration_ms": 1980, "cost_usd_estimate": 0.021, "metadata": {"citations": "evt-0022"}}, {"event_id": "evt-0024", "timestamp": "2026-05-19T12:16:24Z", "session_id": "session-cloud-agent-workflow", "task_id": "customer-support-knowledge-agent", "case_id": "CASE-CLOUD-003", "actor_type": "ai_agent", "actor_name": "gemini-ops-navigator", "phase": "risk_review", "event_type": "cost_signal", "status": "warning", "risk_level": "medium", "human_approval_required": false, "decision": "none", "summary": "Cost guardrail warned that the high-quality model should be reserved for escalations.", "evidence_ref": "evt-0024", "risk_reason": "Projected monthly model spend exceeded the manager's prototype budget.", "cost_usd_estimate": 4.82, "metadata": {"monthly_projection_usd": 143.6}}, {"event_id": "evt-0025", "timestamp": "2026-05-19T12:17:05Z", "session_id": "session-cloud-agent-workflow", "task_id": "customer-support-knowledge-agent", "case_id": "CASE-CLOUD-003", "actor_type": "human", "actor_name": "support-manager", "phase": "approval", "event_type": "approval_gate", "status": "success", "risk_level": "low", "human_approval_required": true, "decision": "approved", "summary": "Human approved the workflow with a rule that expensive model calls are escalation-only.", "evidence_ref": "evt-0025", "metadata": {"approved_budget_mode": "escalation_only"}}, {"event_id": "evt-0026", "timestamp": "2026-05-19T12:17:46Z", "session_id": "session-cloud-agent-workflow", "task_id": "customer-support-knowledge-agent", "case_id": "CASE-CLOUD-003", "actor_type": "system", "actor_name": "agentops-recorder", "phase": "handoff", "event_type": "task_end", "status": "success", "risk_level": "none", "human_approval_required": false, "decision": "none", "summary": "Closed cloud-agent workflow case with source citations, cost guardrail, and human approval captured.", "evidence_ref": "evt-0026", "metadata": {"submission_lanes": "google,microsoft"}}]</script>
+  <script>
+    const filter = document.getElementById('caseFilter');
+    const rows = Array.from(document.querySelectorAll('#timelineBody tr'));
+    filter.addEventListener('change', () => {
+      const value = filter.value;
+      rows.forEach((row) => {
+        row.style.display = value === 'all' || row.dataset.case === value ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

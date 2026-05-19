@@ -1,0 +1,976 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AgentOps Flight Recorder — Splunk Demo</title>
+  <style>
+    :root {
+      --bg: #f5f7f8;
+      --surface: #ffffff;
+      --ink: #14212b;
+      --muted: #64717d;
+      --line: #d7e0e6;
+      --brand: #0b6b4f;
+      --brand-soft: #e7f5ef;
+      --accent: #2251a4;
+      --ok: #087443;
+      --ok-soft: #e7f7ee;
+      --warn: #b54708;
+      --warn-soft: #fff3df;
+      --danger: #b42318;
+      --danger-soft: #ffebe9;
+      --quiet: #edf1f4;
+      --shadow: 0 16px 36px rgba(20, 33, 43, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 18px 48px;
+    }
+
+    .locator {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #143226, #153247);
+      color: #fff;
+      border-radius: 8px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.75fr);
+      gap: 24px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: 20px;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    .hero-copy {
+      margin-top: 14px;
+      color: #d7e9e3;
+      font-size: 16px;
+      max-width: 740px;
+    }
+
+    .query-card {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .query-card code {
+      display: block;
+      color: #d9f5e8;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 13px;
+      white-space: pre-wrap;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .metric,
+    .section,
+    .case-card,
+    .spl-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(20, 33, 43, 0.04);
+    }
+
+    .metric {
+      padding: 16px;
+      min-height: 108px;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 28px;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .section {
+      margin-top: 22px;
+      padding: 20px;
+    }
+
+    .case-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .case-card {
+      padding: 16px;
+      min-height: 188px;
+    }
+
+    .case-card.danger {
+      border-color: #f2aaa4;
+      background: linear-gradient(180deg, #fff, #fff7f6);
+    }
+
+    .case-card.warn {
+      border-color: #ffd49b;
+      background: linear-gradient(180deg, #fff, #fffaf2);
+    }
+
+    .case-card.ok {
+      border-color: #a9dec5;
+      background: linear-gradient(180deg, #fff, #f8fdf9);
+    }
+
+    .case-topline {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .case-id,
+    .event-id {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .case-stats {
+      margin-top: 14px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .case-stats span {
+      background: var(--quiet);
+      border-radius: 999px;
+      padding: 4px 8px;
+    }
+
+    .risk-pill {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      min-height: 24px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .risk-pill.danger {
+      color: var(--danger);
+      background: var(--danger-soft);
+    }
+
+    .risk-pill.warn {
+      color: var(--warn);
+      background: var(--warn-soft);
+    }
+
+    .risk-pill.ok {
+      color: var(--ok);
+      background: var(--ok-soft);
+    }
+
+    .risk-pill.quiet {
+      color: var(--muted);
+      background: var(--quiet);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 12px;
+      text-align: left;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-bottom: 1px solid var(--line);
+      padding: 10px 8px;
+    }
+
+    td {
+      border-bottom: 1px solid var(--line);
+      padding: 12px 8px;
+      vertical-align: top;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    .spl-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .spl-card {
+      padding: 16px;
+      overflow: hidden;
+    }
+
+    pre {
+      margin: 0;
+      padding: 12px;
+      background: #101820;
+      color: #d8f3dc;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 10px;
+    }
+
+    .timeline-row {
+      display: grid;
+      grid-template-columns: 190px minmax(0, 1fr) 92px;
+      gap: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fff;
+      align-items: start;
+    }
+
+    .timeline-main {
+      display: grid;
+      gap: 4px;
+    }
+
+    .timeline-main span,
+    .timeline-main p,
+    .subtle {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 940px) {
+      .hero,
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+
+      .metrics,
+      .case-grid,
+      .spl-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .timeline-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 620px) {
+      main {
+        padding: 16px 12px 32px;
+      }
+
+      h1 {
+        font-size: 27px;
+      }
+
+      .metrics,
+      .case-grid,
+      .spl-grid {
+        grid-template-columns: 1fr;
+      }
+
+      table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="locator">Splunk Agentic Ops · AgentOps Flight Recorder · Demo Artifact</div>
+
+    <section class="hero">
+      <div>
+        <h1>Make AI-agent operations searchable, reviewable, and safe to resume.</h1>
+        <p class="hero-copy">
+          AgentOps Flight Recorder turns human, AI-agent, robot, and API actions into Splunk-ready evidence:
+          risk signals, cost signals, approvals, redactions, blocked actions, and handoff context.
+        </p>
+      </div>
+      <aside class="query-card">
+        <code>index=agentops sourcetype="agentops:json"
+| sort 0 _time
+| table _time event.case_id event.event_id event.risk_level event.status event.summary</code>
+      </aside>
+    </section>
+
+    <section class="metrics">
+      <div class="metric"><strong>26</strong><span>Splunk-ready AgentOps events</span></div>
+      <div class="metric"><strong>3</strong><span>cases reconstructed from event trails</span></div>
+      <div class="metric"><strong>8</strong><span>medium/high/critical risk events</span></div>
+      <div class="metric"><strong>5</strong><span>human approval gates</span></div>
+      <div class="metric"><strong>$4.86</strong><span>estimated model/tool spend in sample</span></div>
+    </section>
+
+    <section class="section">
+      <h2>Case Overview</h2>
+      <div class="case-grid">
+        <article class="case-card danger">
+          <div class="case-topline">
+            <span class="case-id">CASE-AI-OPS-001</span>
+            <span class="risk-pill danger">critical</span>
+          </div>
+          <p>Generated a case handoff report with cited evidence IDs and final rejection decision.</p>
+          <div class="case-stats">
+            <span>11 events</span>
+            <span>3 approvals</span>
+            <span>1 blocked</span>
+            <span>$0.0060</span>
+          </div>
+        </article>
+        
+
+        <article class="case-card danger">
+          <div class="case-topline">
+            <span class="case-id">CASE-DFIR-002</span>
+            <span class="risk-pill danger">high</span>
+          </div>
+          <p>Generated DFIR report with evidence IDs, unsupported claims, and human containment decision.</p>
+          <div class="case-stats">
+            <span>8 events</span>
+            <span>1 approvals</span>
+            <span>0 blocked</span>
+            <span>$0.0120</span>
+          </div>
+        </article>
+        
+
+        <article class="case-card warn">
+          <div class="case-topline">
+            <span class="case-id">CASE-CLOUD-003</span>
+            <span class="risk-pill warn">medium</span>
+          </div>
+          <p>Closed cloud-agent workflow case with source citations, cost guardrail, and human approval captured.</p>
+          <div class="case-stats">
+            <span>7 events</span>
+            <span>1 approvals</span>
+            <span>0 blocked</span>
+            <span>$4.8420</span>
+          </div>
+        </article>
+        </div>
+    </section>
+
+    <section class="section two-col">
+      <div>
+        <h2>High-Risk And Blocked Actions</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Event</th>
+              <th>Case</th>
+              <th>Risk</th>
+              <th>Status</th>
+              <th>Reason</th>
+            </tr>
+          </thead>
+          <tbody>
+        <tr>
+          <td><span class="event-id">evt-0005</span></td>
+          <td>CASE-AI-OPS-001</td>
+          <td><span class="risk-pill warn">medium</span></td>
+          <td>failed</td>
+          <td>Regression test failed around duplicate retry suppression.</td>
+        </tr>
+        
+
+        <tr>
+          <td><span class="event-id">evt-0006</span></td>
+          <td>CASE-AI-OPS-001</td>
+          <td><span class="risk-pill danger">high</span></td>
+          <td>warning</td>
+          <td>Production payment behavior change plus failing regression test.</td>
+        </tr>
+        
+
+        <tr>
+          <td><span class="event-id">evt-0007</span></td>
+          <td>CASE-AI-OPS-001</td>
+          <td><span class="risk-pill danger">critical</span></td>
+          <td>blocked</td>
+          <td>Production deployment is destructive and requires human approval.</td>
+        </tr>
+        
+
+        <tr>
+          <td><span class="event-id">evt-0008</span></td>
+          <td>CASE-AI-OPS-001</td>
+          <td><span class="risk-pill warn">medium</span></td>
+          <td>success</td>
+          <td>Human requested more evidence instead of approving the production deployment.</td>
+        </tr>
+        
+
+        <tr>
+          <td><span class="event-id">evt-0015</span></td>
+          <td>CASE-DFIR-002</td>
+          <td><span class="risk-pill warn">medium</span></td>
+          <td>warning</td>
+          <td>Initial model answer overclaimed malware execution before process evidence was present.</td>
+        </tr>
+        
+
+        <tr>
+          <td><span class="event-id">evt-0016</span></td>
+          <td>CASE-DFIR-002</td>
+          <td><span class="risk-pill danger">high</span></td>
+          <td>warning</td>
+          <td>Unsupported certainty detected in analyst draft.</td>
+        </tr>
+        
+
+        <tr>
+          <td><span class="event-id">evt-0017</span></td>
+          <td>CASE-DFIR-002</td>
+          <td><span class="risk-pill warn">medium</span></td>
+          <td>success</td>
+          <td>Hash lookup returned low-confidence phishing kit association; raw indicator was redacted in report output.</td>
+        </tr>
+        
+
+        <tr>
+          <td><span class="event-id">evt-0024</span></td>
+          <td>CASE-CLOUD-003</td>
+          <td><span class="risk-pill warn">medium</span></td>
+          <td>warning</td>
+          <td>Projected monthly model spend exceeded the manager&#x27;s prototype budget.</td>
+        </tr>
+        </tbody>
+        </table>
+      </div>
+      <div>
+        <h2>Human Approval Queue</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Event</th>
+              <th>Case</th>
+              <th>Decision</th>
+              <th>Summary</th>
+            </tr>
+          </thead>
+          <tbody>
+        <tr>
+          <td><span class="event-id">evt-0007</span></td>
+          <td>CASE-AI-OPS-001</td>
+          <td>blocked_by_policy</td>
+          <td>Attempted production deployment was blocked by policy before execution.</td>
+        </tr>
+        
+
+        <tr>
+          <td><span class="event-id">evt-0008</span></td>
+          <td>CASE-AI-OPS-001</td>
+          <td>needs_more_evidence</td>
+          <td>Human requested more evidence instead of approving the production deployment.</td>
+        </tr>
+        
+
+        <tr>
+          <td><span class="event-id">evt-0010</span></td>
+          <td>CASE-AI-OPS-001</td>
+          <td>rejected</td>
+          <td>Service owner rejected the release until the retry regression is fixed.</td>
+        </tr>
+        
+
+        <tr>
+          <td><span class="event-id">evt-0018</span></td>
+          <td>CASE-DFIR-002</td>
+          <td>approved</td>
+          <td>Human approved containment of the reported message and requested no endpoint isolation.</td>
+        </tr>
+        
+
+        <tr>
+          <td><span class="event-id">evt-0025</span></td>
+          <td>CASE-CLOUD-003</td>
+          <td>approved</td>
+          <td>Human approved the workflow with a rule that expensive model calls are escalation-only.</td>
+        </tr>
+        </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Saved SPL Searches</h2>
+      <div class="spl-grid">
+            <article class="spl-card">
+              <h3>Timeline by case</h3>
+              <pre>index=agentops sourcetype=&quot;agentops:json&quot;
+| sort 0 _time
+| table _time event.case_id event.event_id event.phase event.actor_type event.actor_name event.event_type event.status event.risk_level event.summary</pre>
+            </article>
+            
+
+            <article class="spl-card">
+              <h3>High-risk or blocked actions</h3>
+              <pre>index=agentops sourcetype=&quot;agentops:json&quot; (event.risk_level=&quot;high&quot; OR event.risk_level=&quot;critical&quot; OR event.status=&quot;blocked&quot;)
+| table _time event.case_id event.event_id event.risk_level event.status event.risk_reason event.summary</pre>
+            </article>
+            
+
+            <article class="spl-card">
+              <h3>Human approval queue</h3>
+              <pre>index=agentops sourcetype=&quot;agentops:json&quot; event.human_approval_required=true
+| table _time event.case_id event.event_id event.actor_name event.decision event.summary</pre>
+            </article>
+            
+
+            <article class="spl-card">
+              <h3>Estimated model/tool cost by case</h3>
+              <pre>index=agentops sourcetype=&quot;agentops:json&quot;
+| stats sum(event.cost_usd_estimate) as estimated_cost by event.case_id
+| sort - estimated_cost</pre>
+            </article>
+            </div>
+    </section>
+
+    <section class="section">
+      <h2>Evidence Timeline</h2>
+      <div class="timeline">
+            <article class="timeline-row">
+              <div>
+                <span class="event-id">evt-0001</span>
+                <span class="subtle">CASE-AI-OPS-001</span>
+              </div>
+              <div class="timeline-main">
+                <strong>task_start</strong>
+                <span>human / operations-lead</span>
+                <p>Human opened an AI-agent operations case after a release bot proposed a production change.</p>
+              </div>
+              <span class="risk-pill quiet">none</span>
+            </article>
+            
+
+            <article class="timeline-row">
+              <div>
+                <span class="event-id">evt-0002</span>
+                <span class="subtle">CASE-AI-OPS-001</span>
+              </div>
+              <div class="timeline-main">
+                <strong>plan_update</strong>
+                <span>ai_agent / codex-ops-agent</span>
+                <p>Agent created a read-only investigation plan with explicit approval gates before any production action.</p>
+              </div>
+              <span class="risk-pill ok">low</span>
+            </article>
+            
+
+            <article class="timeline-row">
+              <div>
+                <span class="event-id">evt-0003</span>
+                <span class="subtle">CASE-AI-OPS-001</span>
+              </div>
+              <div class="timeline-main">
+                <strong>robot_task</strong>
+                <span>robot / uipath-evidence-robot</span>
+                <p>Robot gathered the change ticket, linked pull request, deployment window, and service owner.</p>
+              </div>
+              <span class="risk-pill ok">low</span>
+            </article>
+            
+
+            <article class="timeline-row">
+              <div>
+                <span class="event-id">evt-0004</span>
+                <span class="subtle">CASE-AI-OPS-001</span>
+              </div>
+              <div class="timeline-main">
+                <strong>api_call</strong>
+                <span>api / github-api</span>
+                <p>API confirmed the pull request touches payment retry behavior and has one approving review.</p>
+              </div>
+              <span class="risk-pill ok">low</span>
+            </article>
+            
+
+            <article class="timeline-row">
+              <div>
+                <span class="event-id">evt-0005</span>
+                <span class="subtle">CASE-AI-OPS-001</span>
+              </div>
+              <div class="timeline-main">
+                <strong>tool_call</strong>
+                <span>ai_agent / codex-ops-agent</span>
+                <p>Agent found a failing retry regression test that was not mentioned in the change ticket.</p>
+              </div>
+              <span class="risk-pill warn">medium</span>
+            </article>
+            
+
+            <article class="timeline-row">
+              <div>
+                <span class="event-id">evt-0006</span>
+                <span class="subtle">CASE-AI-OPS-001</span>
+              </div>
+              <div class="timeline-main">
+                <strong>risk_signal</strong>
+                <span>ai_agent / codex-ops-agent</span>
+                <p>Case risk escalated because the proposed release affects payments and has failing verification.</p>
+              </div>
+              <span class="risk-pill danger">high</span>
+            </article>
+            
+
+            <article class="timeline-row">
+              <div>
+                <span class="event-id">evt-0007</span>
+                <span class="subtle">CASE-AI-OPS-001</span>
+              </div>
+              <div class="timeline-main">
+                <strong>tool_call</strong>
+                <span>ai_agent / codex-ops-agent</span>
+                <p>Attempted production deployment was blocked by policy before execution.</p>
+              </div>
+              <span class="risk-pill danger">critical</span>
+            </article>
+            
+
+            <article class="timeline-row">
+              <div>
+                <span class="event-id">evt-0008</span>
+                <span class="subtle">CASE-AI-OPS-001</span>
+              </div>
+              <div class="timeline-main">
+                <strong>approval_gate</strong>
+                <span>human / operations-lead</span>
+                <p>Human requested more evidence instead of approving the production deployment.</p>
+              </div>
+              <span class="risk-pill warn">medium</span>
+            </article>
+            
+
+            <article class="timeline-row">
+              <div>
+                <span class="event-id">evt-0009</span>
+                <span class="subtle">CASE-AI-OPS-001</span>
+              </div>
+              <div class="timeline-main">
+                <strong>robot_task</strong>
+                <span>robot / uipath-evidence-robot</span>
+                <p>Robot requested service-owner signoff and attached the failed test evidence.</p>
+              </div>
+              <span class="risk-pill ok">low</span>
+            </article>
+            
+
+            <article class="timeline-row">
+              <div>
+                <span class="event-id">evt-0010</span>
+                <span class="subtle">CASE-AI-OPS-001</span>
+              </div>
+              <div class="timeline-main">
+                <strong>approval_gate</strong>
+                <span>human / service-owner</span>
+                <p>Service owner rejected the release until the retry regression is fixed.</p>
+              </div>
+              <span class="risk-pill ok">low</span>
+            </article>
+            
+
+            <article class="timeline-row">
+              <div>
+                <span class="event-id">evt-0011</span>
+                <span class="subtle">CASE-AI-OPS-001</span>
+              </div>
+              <div class="timeline-main">
+                <strong>handoff_report</strong>
+                <span>system / agentops-recorder</span>
+                <p>Generated a case handoff report with cited evidence IDs and final rejection decision.</p>
+              </div>
+              <span class="risk-pill quiet">none</span>
+            </article>
+            
+
+            <article class="timeline-row">
+              <div>
+                <span class="event-id">evt-0012</span>
+                <span class="subtle">CASE-DFIR-002</span>
+              </div>
+              <div class="timeline-main">
+                <strong>task_start</strong>
+                <span>human / security-analyst</span>
+                <p>Security analyst opened a suspicious email investigation with attached endpoint telemetry.</p>
+              </div>
+              <span class="risk-pill quiet">none</span>
+            </article>
+            
+
+            <article class="timeline-row">
+              <div>
+                <span class="event-id">evt-0013</span>
+                <span class="subtle">CASE-DFIR-002</span>
+              </div>
+              <div class="timeline-main">
+                <strong>plan_update</strong>
+                <span>ai_agent / dfir-analysis-agent</span>
+                <p>Agent proposed an evidence-first DFIR plan: preserve artifacts, list hypotheses, then verify each claim.</p>
+              </div>
+              <span class="risk-pill ok">low</span>
+            </article>
+            
+
+            <article class="timeline-row">
+              <div>
+                <span class="event-id">evt-0014</span>
+                <span class="subtle">CASE-DFIR-002</span>
+              </div>
+              <div class="timeline-main">
+                <strong>evidence_captured</strong>
+                <span>robot / sift-collector</span>
+                <p>Collected email headers, attachment hash, browser download timeline, and endpoint process list.</p>
+              </div>
+              <span class="risk-pill ok">low</span>
+            </article>
+            
+
+            <article class="timeline-row">
+              <div>
+                <span class="event-id">evt-0015</span>
+                <span class="subtle">CASE-DFIR-002</span>
+              </div>
+              <div class="timeline-main">
+                <strong>ai_call</strong>
+                <span>ai_agent / dfir-analysis-agent</span>
+                <p>Agent generated an initial hypothesis but flagged one claim as unsupported by current evidence.</p>
+              </div>
+              <span class="risk-pill warn">medium</span>
+            </article>
+            
+
+            <article class="timeline-row">
+              <div>
+                <span class="event-id">evt-0016</span>
+                <span class="subtle">CASE-DFIR-002</span>
+              </div>
+              <div class="timeline-main">
+                <strong>risk_signal</strong>
+                <span>ai_agent / dfir-analysis-agent</span>
+                <p>System marked the draft finding as provisional because execution evidence was missing.</p>
+              </div>
+              <span class="risk-pill danger">high</span>
+            </article>
+            
+
+            <article class="timeline-row">
+              <div>
+                <span class="event-id">evt-0017</span>
+                <span class="subtle">CASE-DFIR-002</span>
+              </div>
+              <div class="timeline-main">
+                <strong>api_call</strong>
+                <span>api / threat-intel-api</span>
+                <p>Hash lookup returned low-confidence phishing kit association; raw indicator was redacted in report output.</p>
+              </div>
+              <span class="risk-pill warn">medium</span>
+            </article>
+            
+
+            <article class="timeline-row">
+              <div>
+                <span class="event-id">evt-0018</span>
+                <span class="subtle">CASE-DFIR-002</span>
+              </div>
+              <div class="timeline-main">
+                <strong>approval_gate</strong>
+                <span>human / security-analyst</span>
+                <p>Human approved containment of the reported message and requested no endpoint isolation.</p>
+              </div>
+              <span class="risk-pill ok">low</span>
+            </article>
+            
+
+            <article class="timeline-row">
+              <div>
+                <span class="event-id">evt-0019</span>
+                <span class="subtle">CASE-DFIR-002</span>
+              </div>
+              <div class="timeline-main">
+                <strong>handoff_report</strong>
+                <span>system / agentops-recorder</span>
+                <p>Generated DFIR report with evidence IDs, unsupported claims, and human containment decision.</p>
+              </div>
+              <span class="risk-pill quiet">none</span>
+            </article>
+            
+
+            <article class="timeline-row">
+              <div>
+                <span class="event-id">evt-0020</span>
+                <span class="subtle">CASE-CLOUD-003</span>
+              </div>
+              <div class="timeline-main">
+                <strong>task_start</strong>
+                <span>human / support-manager</span>
+                <p>Support manager requested an agent that answers customer questions and escalates uncertain cases.</p>
+              </div>
+              <span class="risk-pill quiet">none</span>
+            </article>
+            
+
+            <article class="timeline-row">
+              <div>
+                <span class="event-id">evt-0021</span>
+                <span class="subtle">CASE-CLOUD-003</span>
+              </div>
+              <div class="timeline-main">
+                <strong>plan_update</strong>
+                <span>ai_agent / gemini-ops-navigator</span>
+                <p>Agent created a workflow plan using retrieval, MCP tools, cost guardrails, and human escalation.</p>
+              </div>
+              <span class="risk-pill ok">low</span>
+            </article>
+            
+
+            <article class="timeline-row">
+              <div>
+                <span class="event-id">evt-0022</span>
+                <span class="subtle">CASE-CLOUD-003</span>
+              </div>
+              <div class="timeline-main">
+                <strong>api_call</strong>
+                <span>api / knowledge-base-mcp</span>
+                <p>MCP retrieval returned the current refund policy and source URL for citation.</p>
+              </div>
+              <span class="risk-pill ok">low</span>
+            </article>
+            
+
+            <article class="timeline-row">
+              <div>
+                <span class="event-id">evt-0023</span>
+                <span class="subtle">CASE-CLOUD-003</span>
+              </div>
+              <div class="timeline-main">
+                <strong>ai_call</strong>
+                <span>ai_agent / gemini-ops-navigator</span>
+                <p>Agent drafted a customer answer grounded in the retrieved refund policy.</p>
+              </div>
+              <span class="risk-pill ok">low</span>
+            </article>
+            
+
+            <article class="timeline-row">
+              <div>
+                <span class="event-id">evt-0024</span>
+                <span class="subtle">CASE-CLOUD-003</span>
+              </div>
+              <div class="timeline-main">
+                <strong>cost_signal</strong>
+                <span>ai_agent / gemini-ops-navigator</span>
+                <p>Cost guardrail warned that the high-quality model should be reserved for escalations.</p>
+              </div>
+              <span class="risk-pill warn">medium</span>
+            </article>
+            
+
+            <article class="timeline-row">
+              <div>
+                <span class="event-id">evt-0025</span>
+                <span class="subtle">CASE-CLOUD-003</span>
+              </div>
+              <div class="timeline-main">
+                <strong>approval_gate</strong>
+                <span>human / support-manager</span>
+                <p>Human approved the workflow with a rule that expensive model calls are escalation-only.</p>
+              </div>
+              <span class="risk-pill ok">low</span>
+            </article>
+            
+
+            <article class="timeline-row">
+              <div>
+                <span class="event-id">evt-0026</span>
+                <span class="subtle">CASE-CLOUD-003</span>
+              </div>
+              <div class="timeline-main">
+                <strong>task_end</strong>
+                <span>system / agentops-recorder</span>
+                <p>Closed cloud-agent workflow case with source citations, cost guardrail, and human approval captured.</p>
+              </div>
+              <span class="risk-pill quiet">none</span>
+            </article>
+            </div>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,304 @@
+{
+  "case_id": "CASE-AI-OPS-001",
+  "case_name": "AI Agent Operations Exception Review",
+  "recommended_uipath_track": "Maestro Case",
+  "current_status": "release_rejected_until_evidence_fixed",
+  "max_risk": "critical",
+  "stages": [
+    {
+      "stage": "Intake",
+      "owner": "Human",
+      "evidence_events": [
+        "evt-0001"
+      ]
+    },
+    {
+      "stage": "Agent Investigation",
+      "owner": "AI Agent",
+      "evidence_events": [
+        "evt-0002",
+        "evt-0005"
+      ]
+    },
+    {
+      "stage": "Robot/API Evidence Collection",
+      "owner": "UiPath Robot + APIs",
+      "evidence_events": [
+        "evt-0003",
+        "evt-0004",
+        "evt-0009"
+      ]
+    },
+    {
+      "stage": "Risk Review",
+      "owner": "Control Plane",
+      "evidence_events": [
+        "evt-0006",
+        "evt-0007"
+      ]
+    },
+    {
+      "stage": "Human Approval",
+      "owner": "Action Center",
+      "evidence_events": [
+        "evt-0007",
+        "evt-0008",
+        "evt-0010"
+      ]
+    },
+    {
+      "stage": "Handoff",
+      "owner": "Recorder",
+      "evidence_events": [
+        "evt-0011"
+      ]
+    }
+  ],
+  "events": [
+    {
+      "event_id": "evt-0001",
+      "timestamp": "2026-05-19T12:00:41Z",
+      "session_id": "session-ai-ops-release-risk",
+      "task_id": "release-risk-review",
+      "case_id": "CASE-AI-OPS-001",
+      "actor_type": "human",
+      "actor_name": "operations-lead",
+      "phase": "intake",
+      "event_type": "task_start",
+      "status": "info",
+      "risk_level": "none",
+      "human_approval_required": false,
+      "decision": "none",
+      "summary": "Human opened an AI-agent operations case after a release bot proposed a production change.",
+      "evidence_ref": "evt-0001",
+      "metadata": {
+        "lane": "uipath",
+        "business_process": "release_exception_review"
+      }
+    },
+    {
+      "event_id": "evt-0002",
+      "timestamp": "2026-05-19T12:01:22Z",
+      "session_id": "session-ai-ops-release-risk",
+      "task_id": "release-risk-review",
+      "case_id": "CASE-AI-OPS-001",
+      "actor_type": "ai_agent",
+      "actor_name": "codex-ops-agent",
+      "phase": "planning",
+      "event_type": "plan_update",
+      "status": "success",
+      "risk_level": "low",
+      "human_approval_required": false,
+      "decision": "none",
+      "summary": "Agent created a read-only investigation plan with explicit approval gates before any production action.",
+      "evidence_ref": "evt-0002",
+      "metadata": {
+        "plan_steps": 5,
+        "approval_gates": 2
+      }
+    },
+    {
+      "event_id": "evt-0003",
+      "timestamp": "2026-05-19T12:02:03Z",
+      "session_id": "session-ai-ops-release-risk",
+      "task_id": "release-risk-review",
+      "case_id": "CASE-AI-OPS-001",
+      "actor_type": "robot",
+      "actor_name": "uipath-evidence-robot",
+      "phase": "evidence_collection",
+      "event_type": "robot_task",
+      "status": "success",
+      "risk_level": "low",
+      "human_approval_required": false,
+      "decision": "none",
+      "summary": "Robot gathered the change ticket, linked pull request, deployment window, and service owner.",
+      "evidence_ref": "evt-0003",
+      "tool": "UiPath Robot",
+      "action": "collect_release_context",
+      "target": "change-ticket-7841",
+      "duration_ms": 4800,
+      "metadata": {
+        "records_collected": 4
+      }
+    },
+    {
+      "event_id": "evt-0004",
+      "timestamp": "2026-05-19T12:02:44Z",
+      "session_id": "session-ai-ops-release-risk",
+      "task_id": "release-risk-review",
+      "case_id": "CASE-AI-OPS-001",
+      "actor_type": "api",
+      "actor_name": "github-api",
+      "phase": "evidence_collection",
+      "event_type": "api_call",
+      "status": "success",
+      "risk_level": "low",
+      "human_approval_required": false,
+      "decision": "none",
+      "summary": "API confirmed the pull request touches payment retry behavior and has one approving review.",
+      "evidence_ref": "evt-0004",
+      "tool": "GitHub API",
+      "action": "read_pull_request",
+      "target": "payments-service/pull/221",
+      "duration_ms": 970,
+      "cost_usd_estimate": 0,
+      "metadata": {
+        "files_changed": 8,
+        "approvals": 1
+      }
+    },
+    {
+      "event_id": "evt-0005",
+      "timestamp": "2026-05-19T12:03:25Z",
+      "session_id": "session-ai-ops-release-risk",
+      "task_id": "release-risk-review",
+      "case_id": "CASE-AI-OPS-001",
+      "actor_type": "ai_agent",
+      "actor_name": "codex-ops-agent",
+      "phase": "investigation",
+      "event_type": "tool_call",
+      "status": "failed",
+      "risk_level": "medium",
+      "human_approval_required": false,
+      "decision": "none",
+      "summary": "Agent found a failing retry regression test that was not mentioned in the change ticket.",
+      "evidence_ref": "evt-0005",
+      "tool": "shell",
+      "action": "run_tests",
+      "target": "payments-service retry tests",
+      "duration_ms": 53200,
+      "risk_reason": "Regression test failed around duplicate retry suppression.",
+      "cost_usd_estimate": 0.006
+    },
+    {
+      "event_id": "evt-0006",
+      "timestamp": "2026-05-19T12:04:06Z",
+      "session_id": "session-ai-ops-release-risk",
+      "task_id": "release-risk-review",
+      "case_id": "CASE-AI-OPS-001",
+      "actor_type": "ai_agent",
+      "actor_name": "codex-ops-agent",
+      "phase": "risk_review",
+      "event_type": "risk_signal",
+      "status": "warning",
+      "risk_level": "high",
+      "human_approval_required": false,
+      "decision": "none",
+      "summary": "Case risk escalated because the proposed release affects payments and has failing verification.",
+      "evidence_ref": "evt-0006",
+      "risk_reason": "Production payment behavior change plus failing regression test.",
+      "metadata": {
+        "risk_rule": "payment_change_failed_test"
+      }
+    },
+    {
+      "event_id": "evt-0007",
+      "timestamp": "2026-05-19T12:04:47Z",
+      "session_id": "session-ai-ops-release-risk",
+      "task_id": "release-risk-review",
+      "case_id": "CASE-AI-OPS-001",
+      "actor_type": "ai_agent",
+      "actor_name": "codex-ops-agent",
+      "phase": "execution",
+      "event_type": "tool_call",
+      "status": "blocked",
+      "risk_level": "critical",
+      "human_approval_required": true,
+      "decision": "blocked_by_policy",
+      "summary": "Attempted production deployment was blocked by policy before execution.",
+      "evidence_ref": "evt-0007",
+      "tool": "shell",
+      "action": "deploy",
+      "target": "production/payments-service",
+      "duration_ms": 120,
+      "risk_reason": "Production deployment is destructive and requires human approval.",
+      "metadata": {
+        "command_class": "production_deploy"
+      }
+    },
+    {
+      "event_id": "evt-0008",
+      "timestamp": "2026-05-19T12:05:28Z",
+      "session_id": "session-ai-ops-release-risk",
+      "task_id": "release-risk-review",
+      "case_id": "CASE-AI-OPS-001",
+      "actor_type": "human",
+      "actor_name": "operations-lead",
+      "phase": "approval",
+      "event_type": "approval_gate",
+      "status": "success",
+      "risk_level": "medium",
+      "human_approval_required": true,
+      "decision": "needs_more_evidence",
+      "summary": "Human requested more evidence instead of approving the production deployment.",
+      "evidence_ref": "evt-0008",
+      "metadata": {
+        "requested": "service_owner_signoff"
+      }
+    },
+    {
+      "event_id": "evt-0009",
+      "timestamp": "2026-05-19T12:06:09Z",
+      "session_id": "session-ai-ops-release-risk",
+      "task_id": "release-risk-review",
+      "case_id": "CASE-AI-OPS-001",
+      "actor_type": "robot",
+      "actor_name": "uipath-evidence-robot",
+      "phase": "evidence_collection",
+      "event_type": "robot_task",
+      "status": "success",
+      "risk_level": "low",
+      "human_approval_required": false,
+      "decision": "none",
+      "summary": "Robot requested service-owner signoff and attached the failed test evidence.",
+      "evidence_ref": "evt-0009",
+      "tool": "UiPath Robot",
+      "action": "request_owner_signoff",
+      "target": "payments-service owner",
+      "duration_ms": 8200,
+      "metadata": {
+        "notification_channel": "case_queue"
+      }
+    },
+    {
+      "event_id": "evt-0010",
+      "timestamp": "2026-05-19T12:06:50Z",
+      "session_id": "session-ai-ops-release-risk",
+      "task_id": "release-risk-review",
+      "case_id": "CASE-AI-OPS-001",
+      "actor_type": "human",
+      "actor_name": "service-owner",
+      "phase": "approval",
+      "event_type": "approval_gate",
+      "status": "success",
+      "risk_level": "low",
+      "human_approval_required": true,
+      "decision": "rejected",
+      "summary": "Service owner rejected the release until the retry regression is fixed.",
+      "evidence_ref": "evt-0010",
+      "metadata": {
+        "release_decision": "hold"
+      }
+    },
+    {
+      "event_id": "evt-0011",
+      "timestamp": "2026-05-19T12:07:31Z",
+      "session_id": "session-ai-ops-release-risk",
+      "task_id": "release-risk-review",
+      "case_id": "CASE-AI-OPS-001",
+      "actor_type": "system",
+      "actor_name": "agentops-recorder",
+      "phase": "handoff",
+      "event_type": "handoff_report",
+      "status": "success",
+      "risk_level": "none",
+      "human_approval_required": false,
+      "decision": "none",
+      "summary": "Generated a case handoff report with cited evidence IDs and final rejection decision.",
+      "evidence_ref": "evt-0011",
+      "metadata": {
+        "cited_events": "evt-0003,evt-0004,evt-0005,evt-0006,evt-0007,evt-0010"
+      }
+    }
+  ]
+}

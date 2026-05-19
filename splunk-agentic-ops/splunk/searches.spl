@@ -1,0 +1,33 @@
+index=agentops sourcetype=agentops:event
+| sort 0 _time
+| table _time session_id task_id actor_type actor_name phase event_type status risk_level human_approval_required summary evidence_ref
+
+---
+
+index=agentops sourcetype=agentops:event risk_level IN ("high", "critical")
+| sort 0 _time
+| table _time session_id task_id actor_name event_type status risk_level risk_reason summary evidence_ref
+
+---
+
+index=agentops sourcetype=agentops:event status IN ("failed", "blocked")
+| stats count as count values(summary) as summaries values(risk_reason) as reasons by session_id task_id status risk_level
+| sort - count
+
+---
+
+index=agentops sourcetype=agentops:event event_type="risk_signal" risk_reason="*Retry loop*"
+| table _time session_id task_id actor_name risk_level risk_reason metadata.retry_count summary evidence_ref
+
+---
+
+index=agentops sourcetype=agentops:event
+| stats sum(cost_usd_estimate) as estimated_cost_usd count as event_count by session_id task_id
+| eval estimated_cost_usd=round(estimated_cost_usd, 4)
+| sort - estimated_cost_usd
+
+---
+
+index=agentops sourcetype=agentops:event human_approval_required=true
+| sort 0 _time
+| table _time session_id task_id actor_name phase event_type status risk_level risk_reason summary evidence_ref
