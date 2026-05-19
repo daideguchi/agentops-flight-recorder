@@ -10,6 +10,12 @@ Submission package: [SUBMISSION_PACKAGE.md](SUBMISSION_PACKAGE.md)
 
 ![AgentOps Flight Recorder dashboard](splunk-agentic-ops/media/flight-recorder-dashboard-full.png)
 
+Draft demo video:
+
+```text
+splunk-agentic-ops/media/agentops-flight-recorder-demo-draft.mp4
+```
+
 Open locally:
 
 - `splunk-agentic-ops/prototype/flight-recorder-dashboard.html`
@@ -34,6 +40,7 @@ python3 scripts/verify_artifacts.py
 ```bash
 cd ../splunk-agentic-ops
 python3 scripts/build_flight_recorder_dashboard.py
+bash scripts/build_demo_video.sh
 ```
 
 Expected proof:

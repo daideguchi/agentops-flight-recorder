@@ -24,6 +24,19 @@ Open these local demo files after cloning the repository:
 - `splunk-agentic-ops/media/flight-recorder-dashboard-full.png`
 - `shared-agentops-engine/media/shared-dashboard-full.png`
 
+## Demo Video
+
+Draft silent video:
+
+- `splunk-agentic-ops/media/agentops-flight-recorder-demo-draft.mp4`
+
+Regenerate:
+
+```bash
+cd splunk-agentic-ops
+bash scripts/build_demo_video.sh
+```
+
 ## Inspiration
 
 AI agents are becoming operational workers. They run commands, call APIs, browse dashboards, retry failures, and hand work back to humans.
@@ -82,6 +95,7 @@ python3 scripts/verify_artifacts.py
 ```bash
 cd ../splunk-agentic-ops
 python3 scripts/build_flight_recorder_dashboard.py
+bash scripts/build_demo_video.sh
 ```
 
 ## Demo Script Summary
