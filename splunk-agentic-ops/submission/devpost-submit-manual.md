@@ -9,8 +9,9 @@ Use this when the Devpost reCAPTCHA gate requires a human click.
 - Repository: https://github.com/daideguchi/agentops-flight-recorder
 - Live demo: https://daideguchi.github.io/agentops-flight-recorder/
 - YouTube demo: https://www.youtube.com/watch?v=KrLB5xI_SCg
-- Architecture: https://github.com/daideguchi/agentops-flight-recorder/blob/main/ARCHITECTURE.md
-- Status: submission-ready package prepared; final Devpost submit not clicked yet
+- Devpost project draft: https://devpost.com/software/agentops-flight-recorder-750zen
+- Architecture: https://github.com/daideguchi/agentops-flight-recorder/blob/main/architecture_diagram.md
+- Status: Devpost draft created and attached to Splunk Agentic Ops at 3/5 steps; additional-info is stopped at DD-only eligibility fields.
 
 ## Manual Start
 
@@ -46,7 +47,7 @@ Python, HTML, CSS, JSON, JSONL, Splunk HEC-shaped events, SPL searches, AgentOps
 - Live demo: https://daideguchi.github.io/agentops-flight-recorder/
 - GitHub repository: https://github.com/daideguchi/agentops-flight-recorder
 - YouTube demo: https://www.youtube.com/watch?v=KrLB5xI_SCg
-- Architecture diagram: https://github.com/daideguchi/agentops-flight-recorder/blob/main/ARCHITECTURE.md
+- Architecture diagram: https://github.com/daideguchi/agentops-flight-recorder/blob/main/architecture_diagram.md
 - Submission package: https://raw.githubusercontent.com/daideguchi/agentops-flight-recorder/main/SUBMISSION_PACKAGE.md
 
 ## Story
@@ -134,4 +135,4 @@ This is a verified local prototype with Splunk-ready artifacts. It does not clai
 
 ## Stopline
 
-Do not claim live Splunk ingestion unless it is actually verified. Do not accept Splunk terms or click the final Devpost submit button unless DD approves that exact action.
+Do not claim live Splunk ingestion unless it is actually verified. Do not answer DD-only eligibility fields such as government employment or country of residence, accept Splunk/Devpost terms, or click the final Devpost submit button unless DD approves that exact action.

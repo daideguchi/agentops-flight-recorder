@@ -10,7 +10,7 @@ Live demo: https://daideguchi.github.io/agentops-flight-recorder/
 
 YouTube demo: https://www.youtube.com/watch?v=KrLB5xI_SCg
 
-Architecture: [ARCHITECTURE.md](ARCHITECTURE.md)
+Architecture: [architecture_diagram.md](architecture_diagram.md) and [ARCHITECTURE.md](ARCHITECTURE.md)
 
 Demo video: `splunk-agentic-ops/media/agentops-flight-recorder-demo.mp4`
 
@@ -20,7 +20,7 @@ Demo video: `splunk-agentic-ops/media/agentops-flight-recorder-demo.mp4`
 - Solution: AgentOps Flight Recorder records human, AI agent, robot, API, and system activity as Splunk-ready operational events.
 - Demo: a local Flight Recorder dashboard reconstructs timelines, risk signals, approval gates, retry loops, cost signals, and handoff points.
 - Splunk fit: the repo includes HEC-shaped event payloads, draft SPL searches, dashboard panels, and an evidence-bound AI investigation pattern.
-- Proof: the prototype generates 26 shared AgentOps events, Splunk-ready HEC JSONL, SPL searches, screenshots, an architecture diagram, and a narrated demo video.
+- Proof: the prototype generates 26 shared AgentOps events, Splunk-ready HEC JSONL, SPL searches, screenshots, a root `architecture_diagram.md`, and a narrated demo video.
 - Boundary: this submission claims a verified local prototype and Splunk-ready artifacts. It does not claim live Splunk Cloud ingestion yet.
 
 ## Demo
@@ -55,6 +55,8 @@ Open in browser:
 ## Architecture
 
 ![AgentOps Flight Recorder architecture](architecture-diagram.svg)
+
+Devpost-required root architecture file: [architecture_diagram.md](architecture_diagram.md)
 
 ## Run Locally
 

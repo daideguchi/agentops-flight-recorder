@@ -22,6 +22,7 @@ https://www.youtube.com/watch?v=KrLB5xI_SCg
 
 ## Architecture Diagram
 
+- `architecture_diagram.md`
 - `ARCHITECTURE.md`
 - `architecture-diagram.svg`
 
@@ -151,7 +152,7 @@ The main challenge was making the demo useful without pretending live Splunk Clo
 - Drafted SPL searches
 - Built a local Flight Recorder dashboard
 - Published a clean public repository
-- Added a root architecture diagram
+- Added a root `architecture_diagram.md` for the Devpost architecture requirement
 - Built a narrated demo video under three minutes
 - Added a repeatable local verification script
 
