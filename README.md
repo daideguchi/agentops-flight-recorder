@@ -8,6 +8,8 @@ Submission package: [SUBMISSION_PACKAGE.md](SUBMISSION_PACKAGE.md)
 
 Live demo: https://daideguchi.github.io/agentops-flight-recorder/
 
+YouTube demo: https://www.youtube.com/watch?v=KrLB5xI_SCg
+
 Architecture: [ARCHITECTURE.md](ARCHITECTURE.md)
 
 Demo video: `splunk-agentic-ops/media/agentops-flight-recorder-demo.mp4`
@@ -28,6 +30,7 @@ Demo video: `splunk-agentic-ops/media/agentops-flight-recorder-demo.mp4`
 Narrated demo video:
 
 ```text
+https://www.youtube.com/watch?v=KrLB5xI_SCg
 splunk-agentic-ops/media/agentops-flight-recorder-demo.mp4
 ```
 

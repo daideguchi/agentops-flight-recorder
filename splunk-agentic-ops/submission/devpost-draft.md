@@ -8,6 +8,13 @@ AgentOps Flight Recorder
 
 AgentOps Flight Recorder is a Splunk-ready black box for AI-agent operations, turning tool calls, browser actions, retries, approvals, cost signals, and risk events into searchable evidence and human-readable incident timelines.
 
+## Links
+
+- Live demo: https://daideguchi.github.io/agentops-flight-recorder/
+- GitHub: https://github.com/daideguchi/agentops-flight-recorder
+- YouTube demo: https://www.youtube.com/watch?v=KrLB5xI_SCg
+- Architecture: https://github.com/daideguchi/agentops-flight-recorder/blob/main/ARCHITECTURE.md
+
 ## Inspiration
 
 AI agents are starting to do real operational work. They run commands, call APIs, browse dashboards, edit files, retry failures, and hand work back to humans.

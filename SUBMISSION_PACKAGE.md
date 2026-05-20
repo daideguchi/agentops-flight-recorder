@@ -16,6 +16,10 @@ https://github.com/daideguchi/agentops-flight-recorder
 
 https://daideguchi.github.io/agentops-flight-recorder/
 
+## YouTube Demo
+
+https://www.youtube.com/watch?v=KrLB5xI_SCg
+
 ## Architecture Diagram
 
 - `ARCHITECTURE.md`
@@ -37,6 +41,7 @@ Open the live demo or these local demo files after cloning the repository:
 
 Narrated demo video:
 
+- YouTube: `https://www.youtube.com/watch?v=KrLB5xI_SCg`
 - `splunk-agentic-ops/media/agentops-flight-recorder-demo.mp4`
 
 Regenerate:
