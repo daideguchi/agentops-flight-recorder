@@ -25,6 +25,10 @@ https://www.youtube.com/watch?v=KrLB5xI_SCg
 - `ARCHITECTURE.md`
 - `architecture-diagram.svg`
 
+## Devpost Manual Submit Guide
+
+- `splunk-agentic-ops/submission/devpost-submit-manual.md`
+
 ## Try It Out
 
 Open the live demo or these local demo files after cloning the repository:
