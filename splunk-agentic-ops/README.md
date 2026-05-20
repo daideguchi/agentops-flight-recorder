@@ -4,7 +4,7 @@
 
 AgentOps Flight Recorder is a hackathon project for the Splunk Agentic Ops Hackathon.
 
-Status: Devpost joined. P1 secondary lane.
+Status: P1 secondary lane, public package prepared.
 
 Current local proof:
 
@@ -12,6 +12,8 @@ Current local proof:
 - Dashboard screenshot: `media/flight-recorder-dashboard-full.png`
 - Dashboard builder: `scripts/build_flight_recorder_dashboard.py`
 - Dashboard panel notes: `reports/splunk-dashboard-panels.md`
+- Narrated demo video: `media/agentops-flight-recorder-demo.mp4`
+- Local verifier: `scripts/run_splunk_local_checks.sh`
 
 ![AgentOps Flight Recorder dashboard](media/flight-recorder-dashboard-full.png)
 
@@ -23,16 +25,16 @@ What did the agent do, why did it do it, what changed, what did it cost, and wha
 
 ## Current Status
 
-This project has just been started after the Coexistence Console Devpost submission was locked.
-
 Current phase:
 
-- Hackathon selected
-- Devpost joined
-- Official rule research started
-- Product thesis drafted
-- MVP plan opened
-- Shared engine adapter generated
+- Public repository is prepared
+- GitHub Pages live demo is prepared
+- HEC-shaped event payloads are generated
+- SPL searches are drafted
+- Local Flight Recorder dashboard is generated
+- Root architecture diagram is present
+- Natural English demo video is generated
+- Final Devpost submission still needs the final submit step and live browser proof
 
 ## Why This Product
 
@@ -145,6 +147,8 @@ Build the Splunk-focused local demo:
 ```bash
 cd /Users/dd/000_AI組織/__hackason/splunk-agentic-ops
 python3 scripts/build_flight_recorder_dashboard.py
+bash scripts/build_demo_video.sh
+bash scripts/run_splunk_local_checks.sh
 ```
 
 Expected proof:
@@ -153,6 +157,8 @@ Expected proof:
 - `prototype/flight-recorder-dashboard.html` exists
 - `reports/splunk-dashboard-panels.md` exists
 - screenshot exists at `media/flight-recorder-dashboard-full.png`
+- video exists at `media/agentops-flight-recorder-demo.mp4`
+- local verifier returns `splunk_local_checks_ok`
 
 Legacy lane-local generator:
 

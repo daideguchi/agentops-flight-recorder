@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
+  <title id="title">AgentOps Flight Recorder architecture</title>
+  <desc id="desc">Human AI workflow events are normalized, exported as Splunk HEC shaped events, searched with SPL, reviewed in a dashboard, and summarized by an evidence-bound AI investigator.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f6f8fb; }
+      .box { fill: #ffffff; stroke: #cfd9e3; stroke-width: 3; rx: 18; }
+      .accent { fill: #0b6b4f; }
+      .blue { fill: #2251a4; }
+      .ink { fill: #13212b; font-family: Arial, Helvetica, sans-serif; }
+      .muted { fill: #5d6b78; font-family: Arial, Helvetica, sans-serif; }
+      .title { font-size: 38px; font-weight: 700; }
+      .label { font-size: 26px; font-weight: 700; }
+      .small { font-size: 20px; }
+      .arrow { stroke: #4b5b68; stroke-width: 5; fill: none; marker-end: url(#arrowhead); }
+      .pill { fill: #e7f5ef; stroke: #b9dfcc; stroke-width: 2; rx: 16; }
+    </style>
+    <marker id="arrowhead" markerWidth="12" markerHeight="8" refX="11" refY="4" orient="auto">
+      <polygon points="0 0, 12 4, 0 8" fill="#4b5b68"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1600" height="1000"/>
+  <text x="80" y="80" class="ink title">AgentOps Flight Recorder</text>
+  <text x="80" y="116" class="muted small">Splunk-ready evidence for human-AI operations</text>
+
+  <rect x="80" y="190" width="300" height="160" class="box"/>
+  <text x="115" y="250" class="ink label">Human-AI Work</text>
+  <text x="115" y="288" class="muted small">Agents, humans, tools,</text>
+  <text x="115" y="318" class="muted small">scripts, APIs, approvals</text>
+
+  <rect x="470" y="190" width="300" height="160" class="box"/>
+  <text x="505" y="250" class="ink label">Event Recorder</text>
+  <text x="505" y="288" class="muted small">Normalizes actions, risk,</text>
+  <text x="505" y="318" class="muted small">cost, retries, evidence IDs</text>
+
+  <rect x="860" y="190" width="300" height="160" class="box"/>
+  <text x="895" y="250" class="ink label">Splunk HEC</text>
+  <text x="895" y="288" class="muted small">JSONL and HEC-shaped</text>
+  <text x="895" y="318" class="muted small">event payloads</text>
+
+  <rect x="1250" y="190" width="270" height="160" class="box"/>
+  <text x="1285" y="250" class="ink label">SPL Searches</text>
+  <text x="1285" y="288" class="muted small">Timeline, risk, retry,</text>
+  <text x="1285" y="318" class="muted small">approval, cost queries</text>
+
+  <path d="M380 270 H470" class="arrow"/>
+  <path d="M770 270 H860" class="arrow"/>
+  <path d="M1160 270 H1250" class="arrow"/>
+
+  <rect x="260" y="520" width="340" height="180" class="box"/>
+  <text x="300" y="585" class="ink label">Flight Recorder UI</text>
+  <text x="300" y="625" class="muted small">Case timeline, risk queue,</text>
+  <text x="300" y="655" class="muted small">approval gates, cost view</text>
+
+  <rect x="710" y="520" width="340" height="180" class="box"/>
+  <text x="750" y="585" class="ink label">Evidence-Bound AI</text>
+  <text x="750" y="625" class="muted small">Summaries must cite</text>
+  <text x="750" y="655" class="muted small">event IDs and SPL rows</text>
+
+  <rect x="1160" y="520" width="300" height="180" class="box"/>
+  <text x="1200" y="585" class="ink label">Human Review</text>
+  <text x="1200" y="625" class="muted small">Approve, reject, escalate,</text>
+  <text x="1200" y="655" class="muted small">or hand off safely</text>
+
+  <path d="M1385 350 V430 H430 V520" class="arrow"/>
+  <path d="M600 610 H710" class="arrow"/>
+  <path d="M1050 610 H1160" class="arrow"/>
+
+  <rect x="84" y="806" width="1432" height="96" class="pill"/>
+  <text x="118" y="852" class="ink label">Claim boundary</text>
+  <text x="118" y="884" class="muted small">Verified local prototype with Splunk-ready artifacts. Live Splunk Cloud ingestion is not claimed yet.</text>
+</svg>
