@@ -1,6 +1,6 @@
 # Devpost Submit Manual — AgentOps Flight Recorder
 
-Use this when the Devpost reCAPTCHA gate requires a human click.
+Use this only if the Devpost project must be recreated or edited manually.
 
 ## Current State
 
@@ -9,11 +9,13 @@ Use this when the Devpost reCAPTCHA gate requires a human click.
 - Repository: https://github.com/daideguchi/agentops-flight-recorder
 - Live demo: https://daideguchi.github.io/agentops-flight-recorder/
 - YouTube demo: https://www.youtube.com/watch?v=KrLB5xI_SCg
-- Devpost project draft: https://devpost.com/software/agentops-flight-recorder-750zen
+- Devpost project: https://devpost.com/software/agentops-flight-recorder-750zen
 - Architecture: https://github.com/daideguchi/agentops-flight-recorder/blob/main/architecture_diagram.md
-- Status: Devpost draft created and attached to Splunk Agentic Ops at 3/5 steps; additional-info is stopped at DD-only eligibility fields.
+- Status: submitted. The Splunk Agentic Ops manage page showed `SUBMITTED` for `AgentOps Flight Recorder` on 2026-05-29 JST.
 
 ## Manual Start
+
+The project is already submitted. Use this section only if a future edit or recreation is required.
 
 1. Open https://devpost.com/software/new
 2. Create project name:

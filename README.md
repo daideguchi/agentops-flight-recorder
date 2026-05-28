@@ -10,6 +10,8 @@ Live demo: https://daideguchi.github.io/agentops-flight-recorder/
 
 YouTube demo: https://www.youtube.com/watch?v=KrLB5xI_SCg
 
+Devpost: https://devpost.com/software/agentops-flight-recorder-750zen
+
 Architecture: [architecture_diagram.md](architecture_diagram.md) and [ARCHITECTURE.md](ARCHITECTURE.md)
 
 Demo video: `splunk-agentic-ops/media/agentops-flight-recorder-demo.mp4`
