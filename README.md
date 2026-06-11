@@ -2,13 +2,15 @@
 
 AgentOps Flight Recorder is a Splunk-ready black box for human-AI operations.
 
-AI agents now run scripts, call APIs, browse tools, update files, and make operational suggestions. The hard part after an incident is reconstructing what actually happened. This project turns agent work into searchable events, risk signals, cost signals, approval gates, and evidence-backed timelines.
+It is for SRE, platform, security, and operations teams that let AI agents touch tickets, tools, APIs, and release workflows. The hard part after an incident is not reading another chat transcript. The hard part is reconstructing what the agent actually did, what risk appeared, who approved the next step, and what evidence supports the summary.
+
+This project turns agent work into searchable events, risk signals, cost signals, approval gates, and evidence-backed timelines. The AI investigator is evidence-bound: it can summarize the incident only from event IDs and SPL-style result rows.
 
 Submission package: [SUBMISSION_PACKAGE.md](SUBMISSION_PACKAGE.md)
 
 Live demo: https://daideguchi.github.io/agentops-flight-recorder/
 
-YouTube demo: https://www.youtube.com/watch?v=KrLB5xI_SCg
+YouTube demo: https://youtu.be/Hg1QRVr76Bs
 
 Devpost: https://devpost.com/software/agentops-flight-recorder-750zen
 
@@ -18,11 +20,12 @@ Demo video: `splunk-agentic-ops/media/agentops-flight-recorder-demo.mp4`
 
 ## Judge Quick Read
 
+- Who: SRE, platform, security, and operations teams responsible for AI-assisted operational work.
 - Problem: AI agents are becoming operational actors, but most teams still cannot search, replay, and audit what an agent actually did after an incident.
 - Solution: AgentOps Flight Recorder records human, AI agent, robot, API, and system activity as Splunk-ready operational events.
-- Demo: a local Flight Recorder dashboard reconstructs timelines, risk signals, approval gates, retry loops, cost signals, and handoff points.
+- Demo: a working Flight Recorder dashboard loads events, filters risky actions and approval gates, runs a Splunk-style search, and generates an evidence-bound AI investigation draft.
 - Splunk fit: the repo includes HEC-shaped event payloads, draft SPL searches, dashboard panels, and an evidence-bound AI investigation pattern.
-- Proof: the prototype generates 26 shared AgentOps events, Splunk-ready HEC JSONL, SPL searches, screenshots, a root `architecture_diagram.md`, and a narrated demo video.
+- Proof: the prototype generates 26 shared AgentOps events, Splunk-ready HEC JSONL, SPL searches, screenshots, a root `architecture_diagram.md`, and a 53.8 second narrated working-demo video.
 - Boundary: this submission claims a verified local prototype and Splunk-ready artifacts. It does not claim live Splunk Cloud ingestion yet.
 
 ## Demo
@@ -32,7 +35,7 @@ Demo video: `splunk-agentic-ops/media/agentops-flight-recorder-demo.mp4`
 Narrated demo video:
 
 ```text
-https://www.youtube.com/watch?v=KrLB5xI_SCg
+https://youtu.be/Hg1QRVr76Bs
 splunk-agentic-ops/media/agentops-flight-recorder-demo.mp4
 ```
 

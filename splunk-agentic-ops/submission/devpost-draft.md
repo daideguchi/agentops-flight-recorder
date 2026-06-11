@@ -6,13 +6,13 @@ AgentOps Flight Recorder
 
 ## Elevator Pitch
 
-AgentOps Flight Recorder is a Splunk-ready black box for AI-agent operations, turning tool calls, browser actions, retries, approvals, cost signals, and risk events into searchable evidence and human-readable incident timelines.
+AgentOps Flight Recorder helps SRE, platform, security, and operations teams investigate what AI agents actually did after a risky run. It turns tool calls, browser actions, retries, approvals, cost signals, and risk events into Splunk-ready evidence and an evidence-bound AI investigation draft.
 
 ## Links
 
 - Live demo: https://daideguchi.github.io/agentops-flight-recorder/
 - GitHub: https://github.com/daideguchi/agentops-flight-recorder
-- YouTube demo: https://www.youtube.com/watch?v=KrLB5xI_SCg
+- YouTube demo: https://youtu.be/Hg1QRVr76Bs
 - Architecture: https://github.com/daideguchi/agentops-flight-recorder/blob/main/ARCHITECTURE.md
 
 ## Inspiration
@@ -20,6 +20,8 @@ AgentOps Flight Recorder is a Splunk-ready black box for AI-agent operations, tu
 AI agents are starting to do real operational work. They run commands, call APIs, browse dashboards, edit files, retry failures, and hand work back to humans.
 
 That is powerful, but it creates a new operational problem: after something happens, teams need to reconstruct what the agent actually did.
+
+The target users are SRE, platform, security, and operations teams that are responsible for systems where AI agents can touch tickets, tools, APIs, and release workflows. A chat transcript is not enough for those teams. They need searchable evidence, approval context, risk signals, cost signals, and a safe human decision point.
 
 I built this from the same human-AI collaboration reality that produced my previous hackathon project. The hard problem is not just making AI act. The hard problem is making AI-assisted work observable, reviewable, and accountable.
 
@@ -32,7 +34,7 @@ Splunk is the natural place for this story. If infrastructure and applications n
 - reconstructs session timelines
 - highlights risky actions, retry loops, approval handoffs, and cost signals
 - provides SPL searches for timeline, risk, retry, approval, and cost review
-- generates an evidence-grounded investigation summary that cites event IDs
+- generates an evidence-bound AI investigation draft that cites event IDs
 - gives humans a clear next action
 
 ## What It Does Not Do
@@ -51,7 +53,7 @@ Splunk is the natural place for this story. If infrastructure and applications n
 - Local Flight Recorder dashboard
 - Root architecture diagram
 - Evidence-bound AI investigation pattern
-- Natural English narrated demo video
+- Natural English narrated working-demo video
 - Repeatable local verification script
 
 Main verification command:
@@ -66,6 +68,7 @@ Observed proof:
 ```text
 splunk_local_checks_ok
 hec_events=26
+video_seconds=53.8
 architecture=root
 claim_boundary=verified_local_splunk_ready_no_live_ingestion_claim
 ```

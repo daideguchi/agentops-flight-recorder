@@ -2,13 +2,13 @@
 
 Target length: under 3 minutes.
 
-## 0:00 - 0:20 Problem
+## 0:00 - 0:12 User And Problem
 
-AI agents are beginning to operate real systems, but after an incident, teams often cannot answer what the agent actually did.
+AgentOps Flight Recorder is for SRE, platform, security, and operations teams that need to know what an AI agent actually did after a risky run.
 
-## 0:20 - 0:45 Event Capture
+## 0:12 - 0:26 Event Capture
 
-Show an agent session emitting structured events:
+Show the dashboard loading an agent session as structured events:
 
 - command run
 - failed retry
@@ -16,17 +16,18 @@ Show an agent session emitting structured events:
 - approval-required action
 - cost signal
 
-## 0:45 - 1:30 Splunk Timeline
+## 0:26 - 0:40 Splunk-Style Review
 
-Show Splunk search/dashboard:
+Show the review flow:
 
 - session timeline
 - failures
 - risky actions
 - approval handoffs
 - cost summary
+- SPL search result
 
-## 1:30 - 2:15 AI-Assisted Investigation
+## 0:40 - 0:54 AI-Assisted Investigation
 
 Generate an evidence-grounded summary:
 
@@ -40,4 +41,3 @@ Generate an evidence-grounded summary:
 Agentic operations need the same visibility as infrastructure operations.
 
 AgentOps Flight Recorder makes AI-agent work searchable, reviewable, and accountable in Splunk.
-

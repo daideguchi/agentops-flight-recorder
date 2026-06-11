@@ -59,6 +59,35 @@
       gap: 24px;
     }
 
+    .judge-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin: 14px 0 18px;
+    }
+
+    .judge-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: 0 8px 20px rgba(20, 33, 43, 0.05);
+      min-height: 150px;
+    }
+
+    .judge-card strong {
+      display: block;
+      color: var(--brand);
+      font-size: 15px;
+      margin-bottom: 8px;
+    }
+
+    .judge-card p {
+      margin: 0;
+      color: var(--ink);
+      font-size: 14px;
+    }
+
     h1 {
       margin: 0;
       font-size: 34px;
@@ -141,6 +170,74 @@
     .section {
       margin-top: 22px;
       padding: 20px;
+    }
+
+    .demo-runner {
+      border: 2px solid rgba(11, 107, 79, 0.32);
+      background: #fbfefd;
+    }
+
+    .control-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 10px 0 14px;
+    }
+
+    .control-row button {
+      appearance: none;
+      border: 1px solid var(--brand);
+      background: var(--brand);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      border-radius: 6px;
+      padding: 10px 14px;
+      cursor: pointer;
+    }
+
+    .control-row button.secondary {
+      color: var(--brand);
+      background: #fff;
+    }
+
+    .demo-output {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      padding: 14px;
+    }
+
+    .demo-output pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 0;
+      background: #101820;
+      color: #e7f5ef;
+      border-radius: 6px;
+      padding: 12px;
+      min-height: 170px;
+      max-height: 310px;
+      overflow: auto;
+      font-size: 13px;
+    }
+
+    .ai-panel {
+      border-left: 4px solid var(--brand);
+      padding-left: 14px;
+    }
+
+    .ai-panel h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .ai-panel ul {
+      margin: 8px 0 0;
+      padding-left: 20px;
     }
 
     .case-grid {
@@ -320,8 +417,13 @@
 
       .metrics,
       .case-grid,
+      .judge-grid,
       .spl-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .demo-output {
+        grid-template-columns: 1fr;
       }
 
       .timeline-row {
@@ -340,6 +442,7 @@
 
       .metrics,
       .case-grid,
+      .judge-grid,
       .spl-grid {
         grid-template-columns: 1fr;
       }
@@ -358,10 +461,11 @@
 
     <section class="hero">
       <div>
-        <h1>Make AI-agent operations searchable, reviewable, and safe to resume.</h1>
+        <h1>Help ops teams investigate what AI agents actually did.</h1>
         <p class="hero-copy">
-          AgentOps Flight Recorder turns human, AI-agent, robot, and API actions into Splunk-ready evidence:
-          risk signals, cost signals, approvals, redactions, blocked actions, and handoff context.
+          AgentOps Flight Recorder is for SRE, platform, security, and operations teams that need
+          an audit trail when AI agents run tools. It turns agent actions into Splunk-ready evidence
+          and uses evidence-bound AI to explain the incident without inventing facts.
         </p>
       </div>
       <aside class="query-card">
@@ -371,12 +475,55 @@
       </aside>
     </section>
 
+    <section class="judge-grid" aria-label="Judge quick answer">
+              <article class="judge-card">
+          <strong>Who</strong>
+          <p>SRE, platform, security, and operations teams that let AI agents touch tickets, tools, APIs, and release workflows.</p>
+        </article>
+        <article class="judge-card">
+          <strong>Pain</strong>
+          <p>After a bad action, a chat transcript is not enough. Teams need to search what the agent did, where risk appeared, and who approved the next step.</p>
+        </article>
+        <article class="judge-card">
+          <strong>AI Use</strong>
+          <p>The AI investigator is evidence-bound: it summarizes only from event IDs and SPL result rows, then asks a human to approve, reject, or hand off.</p>
+        </article>
+        <article class="judge-card">
+          <strong>Value</strong>
+          <p>Agent work becomes Splunk-ready operational evidence instead of an unreviewable conversation.</p>
+        </article>
+    </section>
+
     <section class="metrics">
       <div class="metric"><strong>26</strong><span>Splunk-ready AgentOps events</span></div>
       <div class="metric"><strong>3</strong><span>cases reconstructed from event trails</span></div>
       <div class="metric"><strong>8</strong><span>medium/high/critical risk events</span></div>
       <div class="metric"><strong>5</strong><span>human approval gates</span></div>
       <div class="metric"><strong>$4.86</strong><span>estimated model/tool spend in sample</span></div>
+    </section>
+
+    <section class="section demo-runner" id="demo-runner">
+      <h2>Run The Review Flow</h2>
+      <p>
+        This is the working prototype path: load event evidence, narrow to risk or approvals,
+        run a Splunk-style search, then generate an evidence-bound AI investigation draft.
+      </p>
+      <div class="control-row">
+        <button type="button" data-demo-filter="all">Load All Events</button>
+        <button type="button" data-demo-filter="risk">Show Risky Events</button>
+        <button type="button" data-demo-filter="approval">Show Approval Gates</button>
+        <button class="secondary" type="button" data-demo-spl>Run SPL Search</button>
+        <button class="secondary" type="button" data-demo-ai>Generate AI Summary</button>
+      </div>
+      <div class="demo-output">
+        <pre id="demo-query-output">index=agentops sourcetype="agentops:json"
+| sort 0 _time
+| table _time event.case_id event.event_id event.risk_level event.status event.summary</pre>
+        <div class="ai-panel" id="demo-ai-output">
+          <h3>Evidence-Bound AI Investigator</h3>
+          <p>Choose a filter or run the AI summary. The assistant is constrained to cite event IDs from the evidence trail.</p>
+        </div>
+      </div>
     </section>
 
     <section class="section">
@@ -607,7 +754,7 @@
     <section class="section">
       <h2>Evidence Timeline</h2>
       <div class="timeline">
-            <article class="timeline-row">
+            <article class="timeline-row" data-risk-weight="0" data-approval="no" data-case="CASE-AI-OPS-001">
               <div>
                 <span class="event-id">evt-0001</span>
                 <span class="subtle">CASE-AI-OPS-001</span>
@@ -621,7 +768,7 @@
             </article>
             
 
-            <article class="timeline-row">
+            <article class="timeline-row" data-risk-weight="1" data-approval="no" data-case="CASE-AI-OPS-001">
               <div>
                 <span class="event-id">evt-0002</span>
                 <span class="subtle">CASE-AI-OPS-001</span>
@@ -635,7 +782,7 @@
             </article>
             
 
-            <article class="timeline-row">
+            <article class="timeline-row" data-risk-weight="1" data-approval="no" data-case="CASE-AI-OPS-001">
               <div>
                 <span class="event-id">evt-0003</span>
                 <span class="subtle">CASE-AI-OPS-001</span>
@@ -649,7 +796,7 @@
             </article>
             
 
-            <article class="timeline-row">
+            <article class="timeline-row" data-risk-weight="1" data-approval="no" data-case="CASE-AI-OPS-001">
               <div>
                 <span class="event-id">evt-0004</span>
                 <span class="subtle">CASE-AI-OPS-001</span>
@@ -663,7 +810,7 @@
             </article>
             
 
-            <article class="timeline-row">
+            <article class="timeline-row" data-risk-weight="2" data-approval="no" data-case="CASE-AI-OPS-001">
               <div>
                 <span class="event-id">evt-0005</span>
                 <span class="subtle">CASE-AI-OPS-001</span>
@@ -677,7 +824,7 @@
             </article>
             
 
-            <article class="timeline-row">
+            <article class="timeline-row" data-risk-weight="3" data-approval="no" data-case="CASE-AI-OPS-001">
               <div>
                 <span class="event-id">evt-0006</span>
                 <span class="subtle">CASE-AI-OPS-001</span>
@@ -691,7 +838,7 @@
             </article>
             
 
-            <article class="timeline-row">
+            <article class="timeline-row" data-risk-weight="4" data-approval="yes" data-case="CASE-AI-OPS-001">
               <div>
                 <span class="event-id">evt-0007</span>
                 <span class="subtle">CASE-AI-OPS-001</span>
@@ -705,7 +852,7 @@
             </article>
             
 
-            <article class="timeline-row">
+            <article class="timeline-row" data-risk-weight="2" data-approval="yes" data-case="CASE-AI-OPS-001">
               <div>
                 <span class="event-id">evt-0008</span>
                 <span class="subtle">CASE-AI-OPS-001</span>
@@ -719,7 +866,7 @@
             </article>
             
 
-            <article class="timeline-row">
+            <article class="timeline-row" data-risk-weight="1" data-approval="no" data-case="CASE-AI-OPS-001">
               <div>
                 <span class="event-id">evt-0009</span>
                 <span class="subtle">CASE-AI-OPS-001</span>
@@ -733,7 +880,7 @@
             </article>
             
 
-            <article class="timeline-row">
+            <article class="timeline-row" data-risk-weight="1" data-approval="yes" data-case="CASE-AI-OPS-001">
               <div>
                 <span class="event-id">evt-0010</span>
                 <span class="subtle">CASE-AI-OPS-001</span>
@@ -747,7 +894,7 @@
             </article>
             
 
-            <article class="timeline-row">
+            <article class="timeline-row" data-risk-weight="0" data-approval="no" data-case="CASE-AI-OPS-001">
               <div>
                 <span class="event-id">evt-0011</span>
                 <span class="subtle">CASE-AI-OPS-001</span>
@@ -761,7 +908,7 @@
             </article>
             
 
-            <article class="timeline-row">
+            <article class="timeline-row" data-risk-weight="0" data-approval="no" data-case="CASE-DFIR-002">
               <div>
                 <span class="event-id">evt-0012</span>
                 <span class="subtle">CASE-DFIR-002</span>
@@ -775,7 +922,7 @@
             </article>
             
 
-            <article class="timeline-row">
+            <article class="timeline-row" data-risk-weight="1" data-approval="no" data-case="CASE-DFIR-002">
               <div>
                 <span class="event-id">evt-0013</span>
                 <span class="subtle">CASE-DFIR-002</span>
@@ -789,7 +936,7 @@
             </article>
             
 
-            <article class="timeline-row">
+            <article class="timeline-row" data-risk-weight="1" data-approval="no" data-case="CASE-DFIR-002">
               <div>
                 <span class="event-id">evt-0014</span>
                 <span class="subtle">CASE-DFIR-002</span>
@@ -803,7 +950,7 @@
             </article>
             
 
-            <article class="timeline-row">
+            <article class="timeline-row" data-risk-weight="2" data-approval="no" data-case="CASE-DFIR-002">
               <div>
                 <span class="event-id">evt-0015</span>
                 <span class="subtle">CASE-DFIR-002</span>
@@ -817,7 +964,7 @@
             </article>
             
 
-            <article class="timeline-row">
+            <article class="timeline-row" data-risk-weight="3" data-approval="no" data-case="CASE-DFIR-002">
               <div>
                 <span class="event-id">evt-0016</span>
                 <span class="subtle">CASE-DFIR-002</span>
@@ -831,7 +978,7 @@
             </article>
             
 
-            <article class="timeline-row">
+            <article class="timeline-row" data-risk-weight="2" data-approval="no" data-case="CASE-DFIR-002">
               <div>
                 <span class="event-id">evt-0017</span>
                 <span class="subtle">CASE-DFIR-002</span>
@@ -845,7 +992,7 @@
             </article>
             
 
-            <article class="timeline-row">
+            <article class="timeline-row" data-risk-weight="1" data-approval="yes" data-case="CASE-DFIR-002">
               <div>
                 <span class="event-id">evt-0018</span>
                 <span class="subtle">CASE-DFIR-002</span>
@@ -859,7 +1006,7 @@
             </article>
             
 
-            <article class="timeline-row">
+            <article class="timeline-row" data-risk-weight="0" data-approval="no" data-case="CASE-DFIR-002">
               <div>
                 <span class="event-id">evt-0019</span>
                 <span class="subtle">CASE-DFIR-002</span>
@@ -873,7 +1020,7 @@
             </article>
             
 
-            <article class="timeline-row">
+            <article class="timeline-row" data-risk-weight="0" data-approval="no" data-case="CASE-CLOUD-003">
               <div>
                 <span class="event-id">evt-0020</span>
                 <span class="subtle">CASE-CLOUD-003</span>
@@ -887,7 +1034,7 @@
             </article>
             
 
-            <article class="timeline-row">
+            <article class="timeline-row" data-risk-weight="1" data-approval="no" data-case="CASE-CLOUD-003">
               <div>
                 <span class="event-id">evt-0021</span>
                 <span class="subtle">CASE-CLOUD-003</span>
@@ -901,7 +1048,7 @@
             </article>
             
 
-            <article class="timeline-row">
+            <article class="timeline-row" data-risk-weight="1" data-approval="no" data-case="CASE-CLOUD-003">
               <div>
                 <span class="event-id">evt-0022</span>
                 <span class="subtle">CASE-CLOUD-003</span>
@@ -915,7 +1062,7 @@
             </article>
             
 
-            <article class="timeline-row">
+            <article class="timeline-row" data-risk-weight="1" data-approval="no" data-case="CASE-CLOUD-003">
               <div>
                 <span class="event-id">evt-0023</span>
                 <span class="subtle">CASE-CLOUD-003</span>
@@ -929,7 +1076,7 @@
             </article>
             
 
-            <article class="timeline-row">
+            <article class="timeline-row" data-risk-weight="2" data-approval="no" data-case="CASE-CLOUD-003">
               <div>
                 <span class="event-id">evt-0024</span>
                 <span class="subtle">CASE-CLOUD-003</span>
@@ -943,7 +1090,7 @@
             </article>
             
 
-            <article class="timeline-row">
+            <article class="timeline-row" data-risk-weight="1" data-approval="yes" data-case="CASE-CLOUD-003">
               <div>
                 <span class="event-id">evt-0025</span>
                 <span class="subtle">CASE-CLOUD-003</span>
@@ -957,7 +1104,7 @@
             </article>
             
 
-            <article class="timeline-row">
+            <article class="timeline-row" data-risk-weight="0" data-approval="no" data-case="CASE-CLOUD-003">
               <div>
                 <span class="event-id">evt-0026</span>
                 <span class="subtle">CASE-CLOUD-003</span>
@@ -972,5 +1119,61 @@
             </div>
     </section>
   </main>
+  <script>
+    const EVENTS = [{"event_id": "evt-0001", "case_id": "CASE-AI-OPS-001", "risk_level": "none", "status": "info", "summary": "Human opened an AI-agent operations case after a release bot proposed a production change.", "decision": "none", "approval": false, "cost": 0.0}, {"event_id": "evt-0002", "case_id": "CASE-AI-OPS-001", "risk_level": "low", "status": "success", "summary": "Agent created a read-only investigation plan with explicit approval gates before any production action.", "decision": "none", "approval": false, "cost": 0.0}, {"event_id": "evt-0003", "case_id": "CASE-AI-OPS-001", "risk_level": "low", "status": "success", "summary": "Robot gathered the change ticket, linked pull request, deployment window, and service owner.", "decision": "none", "approval": false, "cost": 0.0}, {"event_id": "evt-0004", "case_id": "CASE-AI-OPS-001", "risk_level": "low", "status": "success", "summary": "API confirmed the pull request touches payment retry behavior and has one approving review.", "decision": "none", "approval": false, "cost": 0.0}, {"event_id": "evt-0005", "case_id": "CASE-AI-OPS-001", "risk_level": "medium", "status": "failed", "summary": "Agent found a failing retry regression test that was not mentioned in the change ticket.", "decision": "none", "approval": false, "cost": 0.006}, {"event_id": "evt-0006", "case_id": "CASE-AI-OPS-001", "risk_level": "high", "status": "warning", "summary": "Case risk escalated because the proposed release affects payments and has failing verification.", "decision": "none", "approval": false, "cost": 0.0}, {"event_id": "evt-0007", "case_id": "CASE-AI-OPS-001", "risk_level": "critical", "status": "blocked", "summary": "Attempted production deployment was blocked by policy before execution.", "decision": "blocked_by_policy", "approval": true, "cost": 0.0}, {"event_id": "evt-0008", "case_id": "CASE-AI-OPS-001", "risk_level": "medium", "status": "success", "summary": "Human requested more evidence instead of approving the production deployment.", "decision": "needs_more_evidence", "approval": true, "cost": 0.0}, {"event_id": "evt-0009", "case_id": "CASE-AI-OPS-001", "risk_level": "low", "status": "success", "summary": "Robot requested service-owner signoff and attached the failed test evidence.", "decision": "none", "approval": false, "cost": 0.0}, {"event_id": "evt-0010", "case_id": "CASE-AI-OPS-001", "risk_level": "low", "status": "success", "summary": "Service owner rejected the release until the retry regression is fixed.", "decision": "rejected", "approval": true, "cost": 0.0}, {"event_id": "evt-0011", "case_id": "CASE-AI-OPS-001", "risk_level": "none", "status": "success", "summary": "Generated a case handoff report with cited evidence IDs and final rejection decision.", "decision": "none", "approval": false, "cost": 0.0}, {"event_id": "evt-0012", "case_id": "CASE-DFIR-002", "risk_level": "none", "status": "info", "summary": "Security analyst opened a suspicious email investigation with attached endpoint telemetry.", "decision": "none", "approval": false, "cost": 0.0}, {"event_id": "evt-0013", "case_id": "CASE-DFIR-002", "risk_level": "low", "status": "success", "summary": "Agent proposed an evidence-first DFIR plan: preserve artifacts, list hypotheses, then verify each claim.", "decision": "none", "approval": false, "cost": 0.0}, {"event_id": "evt-0014", "case_id": "CASE-DFIR-002", "risk_level": "low", "status": "success", "summary": "Collected email headers, attachment hash, browser download timeline, and endpoint process list.", "decision": "none", "approval": false, "cost": 0.0}, {"event_id": "evt-0015", "case_id": "CASE-DFIR-002", "risk_level": "medium", "status": "warning", "summary": "Agent generated an initial hypothesis but flagged one claim as unsupported by current evidence.", "decision": "none", "approval": false, "cost": 0.012}, {"event_id": "evt-0016", "case_id": "CASE-DFIR-002", "risk_level": "high", "status": "warning", "summary": "System marked the draft finding as provisional because execution evidence was missing.", "decision": "none", "approval": false, "cost": 0.0}, {"event_id": "evt-0017", "case_id": "CASE-DFIR-002", "risk_level": "medium", "status": "success", "summary": "Hash lookup returned low-confidence phishing kit association; raw indicator was redacted in report output.", "decision": "none", "approval": false, "cost": 0.0}, {"event_id": "evt-0018", "case_id": "CASE-DFIR-002", "risk_level": "low", "status": "success", "summary": "Human approved containment of the reported message and requested no endpoint isolation.", "decision": "approved", "approval": true, "cost": 0.0}, {"event_id": "evt-0019", "case_id": "CASE-DFIR-002", "risk_level": "none", "status": "success", "summary": "Generated DFIR report with evidence IDs, unsupported claims, and human containment decision.", "decision": "none", "approval": false, "cost": 0.0}, {"event_id": "evt-0020", "case_id": "CASE-CLOUD-003", "risk_level": "none", "status": "info", "summary": "Support manager requested an agent that answers customer questions and escalates uncertain cases.", "decision": "none", "approval": false, "cost": 0.0}, {"event_id": "evt-0021", "case_id": "CASE-CLOUD-003", "risk_level": "low", "status": "success", "summary": "Agent created a workflow plan using retrieval, MCP tools, cost guardrails, and human escalation.", "decision": "none", "approval": false, "cost": 0.0}, {"event_id": "evt-0022", "case_id": "CASE-CLOUD-003", "risk_level": "low", "status": "success", "summary": "MCP retrieval returned the current refund policy and source URL for citation.", "decision": "none", "approval": false, "cost": 0.001}, {"event_id": "evt-0023", "case_id": "CASE-CLOUD-003", "risk_level": "low", "status": "success", "summary": "Agent drafted a customer answer grounded in the retrieved refund policy.", "decision": "none", "approval": false, "cost": 0.021}, {"event_id": "evt-0024", "case_id": "CASE-CLOUD-003", "risk_level": "medium", "status": "warning", "summary": "Cost guardrail warned that the high-quality model should be reserved for escalations.", "decision": "none", "approval": false, "cost": 4.82}, {"event_id": "evt-0025", "case_id": "CASE-CLOUD-003", "risk_level": "low", "status": "success", "summary": "Human approved the workflow with a rule that expensive model calls are escalation-only.", "decision": "approved", "approval": true, "cost": 0.0}, {"event_id": "evt-0026", "case_id": "CASE-CLOUD-003", "risk_level": "none", "status": "success", "summary": "Closed cloud-agent workflow case with source citations, cost guardrail, and human approval captured.", "decision": "none", "approval": false, "cost": 0.0}];
+    const output = document.getElementById('demo-query-output');
+    const aiOutput = document.getElementById('demo-ai-output');
+    const timelineRows = [...document.querySelectorAll('.timeline-row')];
+
+    const visibleEvents = () => timelineRows
+      .filter((row) => row.style.display !== 'none')
+      .map((row) => row.querySelector('.event-id').textContent.trim());
+
+    function setTimelineFilter(mode) {
+      let count = 0;
+      timelineRows.forEach((row) => {
+        const riskWeight = Number(row.dataset.riskWeight || '0');
+        const approval = row.dataset.approval === 'yes';
+        const show = mode === 'all' || (mode === 'risk' && riskWeight >= 2) || (mode === 'approval' && approval);
+        row.style.display = show ? '' : 'none';
+        if (show) count += 1;
+      });
+      const label = mode === 'all' ? 'all events' : mode === 'risk' ? 'medium/high/critical or blocked events' : 'approval gates';
+      output.textContent = `Loaded ${count} ${label} from the AgentOps event trail.\n\nVisible event IDs: ${visibleEvents().join(', ')}`;
+      aiOutput.innerHTML = `<h3>Evidence Filter Applied</h3><p>The review surface is now limited to <strong>${label}</strong>. Every row still carries a case ID and event ID for Splunk lookup.</p>`;
+    }
+
+    function runSplSearch() {
+      const risky = EVENTS.filter((event) => ['medium', 'high', 'critical'].includes(event.risk_level) || event.status === 'blocked');
+      output.textContent = `index=agentops sourcetype="agentops:json"\n| search event.risk_level IN ("medium","high","critical") OR event.status="blocked"\n| table _time event.case_id event.event_id event.risk_level event.status event.summary\n\nMatched rows: ${risky.length}\nEvent IDs: ${risky.map((event) => event.event_id).join(', ')}`;
+      aiOutput.innerHTML = `<h3>SPL Search Result</h3><p>The same investigation can move into Splunk: the prototype already ships HEC-shaped JSON and saved SPL searches.</p>`;
+    }
+
+    function generateAiSummary() {
+      const risky = EVENTS.filter((event) => ['medium', 'high', 'critical'].includes(event.risk_level) || event.status === 'blocked');
+      const approvals = EVENTS.filter((event) => event.approval || event.decision !== 'none');
+      const cost = EVENTS.reduce((sum, event) => sum + Number(event.cost || 0), 0);
+      const riskIds = risky.map((event) => event.event_id).slice(0, 8);
+      const approvalIds = approvals.map((event) => event.event_id).slice(0, 8);
+      output.textContent = `AI prompt boundary:\nUse only the AgentOps events visible in this case. Cite event IDs. Do not infer facts that are not in Splunk-searchable evidence.\n\nEvidence set: ${EVENTS.length} events, ${risky.length} risk/blocked rows, ${approvals.length} approval rows.`;
+      aiOutput.innerHTML = `
+        <h3>AI Investigation Draft</h3>
+        <p><strong>What happened:</strong> the agent session contains risky or blocked operational actions that need human review before continuation.</p>
+        <ul>
+          <li><strong>Risk evidence:</strong> ${riskIds.join(', ')}</li>
+          <li><strong>Approval evidence:</strong> ${approvalIds.join(', ')}</li>
+          <li><strong>Cost signal:</strong> estimated model/tool spend is $${cost.toFixed(2)} across the sample trail.</li>
+          <li><strong>Next safe action:</strong> human reviewer should approve, reject, or hand off using the cited event IDs.</li>
+        </ul>
+        <p>No unsupported claim is included because every sentence must map back to an event row.</p>
+      `;
+    }
+
+    document.querySelectorAll('[data-demo-filter]').forEach((button) => {
+      button.addEventListener('click', () => setTimelineFilter(button.dataset.demoFilter));
+    });
+    document.querySelector('[data-demo-spl]').addEventListener('click', runSplSearch);
+    document.querySelector('[data-demo-ai]').addEventListener('click', generateAiSummary);
+  </script>
 </body>
 </html>

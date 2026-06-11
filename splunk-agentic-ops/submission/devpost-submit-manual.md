@@ -8,7 +8,7 @@ Use this only if the Devpost project must be recreated or edited manually.
 - Project: AgentOps Flight Recorder
 - Repository: https://github.com/daideguchi/agentops-flight-recorder
 - Live demo: https://daideguchi.github.io/agentops-flight-recorder/
-- YouTube demo: https://www.youtube.com/watch?v=KrLB5xI_SCg
+- YouTube demo: https://youtu.be/Hg1QRVr76Bs
 - Devpost project: https://devpost.com/software/agentops-flight-recorder-750zen
 - Architecture: https://github.com/daideguchi/agentops-flight-recorder/blob/main/architecture_diagram.md
 - Status: submitted. The Splunk Agentic Ops manage page showed `SUBMITTED` for `AgentOps Flight Recorder` on 2026-05-29 JST.
@@ -48,7 +48,7 @@ Python, HTML, CSS, JSON, JSONL, Splunk HEC-shaped events, SPL searches, AgentOps
 
 - Live demo: https://daideguchi.github.io/agentops-flight-recorder/
 - GitHub repository: https://github.com/daideguchi/agentops-flight-recorder
-- YouTube demo: https://www.youtube.com/watch?v=KrLB5xI_SCg
+- YouTube demo: https://youtu.be/Hg1QRVr76Bs
 - Architecture diagram: https://github.com/daideguchi/agentops-flight-recorder/blob/main/architecture_diagram.md
 - Submission package: https://raw.githubusercontent.com/daideguchi/agentops-flight-recorder/main/SUBMISSION_PACKAGE.md
 
@@ -60,6 +60,8 @@ Python, HTML, CSS, JSON, JSONL, Splunk HEC-shaped events, SPL searches, AgentOps
 AI agents are starting to do real operational work. They run commands, call APIs, browse dashboards, edit files, retry failures, and hand work back to humans.
 
 That is powerful, but it creates a new operational problem: after something happens, teams need to reconstruct what the agent actually did.
+
+The target users are SRE, platform, security, and operations teams that are responsible for systems where AI agents can touch tickets, tools, APIs, and release workflows. A chat transcript is not enough for those teams. They need searchable evidence, approval context, risk signals, cost signals, and a safe human decision point.
 
 Splunk is the natural place for this story. If infrastructure and applications need searchable telemetry, AI agents need it too.
 
@@ -77,7 +79,7 @@ The demo turns those events into:
 - an evidence-bound AI investigation pattern
 - a root architecture diagram
 
-The AI layer is intentionally evidence-bound. It can summarize what happened, but it must cite event IDs and search result rows instead of inventing facts.
+The working demo loads the event trail, filters risky actions, reviews approval gates, runs a Splunk-style search, and generates an evidence-bound AI investigation draft. The AI layer must cite event IDs and search result rows instead of inventing facts.
 
 ## How we built it
 
@@ -86,7 +88,7 @@ The AI layer is intentionally evidence-bound. It can summarize what happened, bu
 - SPL search drafts
 - Local dashboard generator
 - Root architecture diagram
-- Natural English narrated demo video
+- Natural English narrated working-demo video
 - Repeatable local verification script
 - Public sanitized sample data
 
@@ -102,7 +104,7 @@ Observed proof:
 ```text
 splunk_local_checks_ok
 hec_events=26
-video_seconds=87.4
+video_seconds=53.8
 architecture=root
 claim_boundary=verified_local_splunk_ready_no_live_ingestion_claim
 ```

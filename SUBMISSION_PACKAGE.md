@@ -18,7 +18,7 @@ https://daideguchi.github.io/agentops-flight-recorder/
 
 ## YouTube Demo
 
-https://www.youtube.com/watch?v=KrLB5xI_SCg
+https://youtu.be/Hg1QRVr76Bs
 
 ## Architecture Diagram
 
@@ -46,7 +46,7 @@ Open the live demo or these local demo files after cloning the repository:
 
 Narrated demo video:
 
-- YouTube: `https://www.youtube.com/watch?v=KrLB5xI_SCg`
+- YouTube: `https://youtu.be/Hg1QRVr76Bs`
 - `splunk-agentic-ops/media/agentops-flight-recorder-demo.mp4`
 
 Regenerate:
@@ -62,6 +62,8 @@ bash scripts/run_splunk_local_checks.sh
 AI agents are becoming operational workers. They run commands, call APIs, browse dashboards, retry failures, and hand work back to humans.
 
 The problem is not only whether the agent gave a good answer. The problem is whether a team can reconstruct what the agent actually did after something goes wrong.
+
+This is built for SRE, platform, security, and operations teams that are responsible for AI-assisted operational work. A chat transcript is not enough for those teams. They need searchable evidence, approval context, risk signals, cost signals, and a safe way for humans to decide what happens next.
 
 Splunk already gives teams a way to search, monitor, and investigate operational systems. AgentOps Flight Recorder applies that same discipline to AI agents: if agents become part of operations, their actions need to become searchable evidence.
 
@@ -80,6 +82,8 @@ AgentOps Flight Recorder captures AI-agent work as structured operational events
 
 The demo turns those events into a Splunk-ready timeline and a local dashboard for incident review. The AI investigation layer is evidence-bound: summaries must cite event IDs and SPL result rows instead of inventing facts.
 
+In the working demo, the user loads the event trail, filters risky actions, reviews approval gates, runs a Splunk-style search, and generates an AI investigation draft that is constrained to cited event IDs.
+
 ## How We Built It
 
 - AgentOps JSON event schema
@@ -87,7 +91,7 @@ The demo turns those events into a Splunk-ready timeline and a local dashboard f
 - Draft SPL searches
 - Local dashboard generator
 - Root architecture diagram
-- Natural English narrated demo video
+- Natural English narrated working-demo video
 - Evidence-bound AI investigation pattern
 - Shared evidence stream used across multiple hackathon lanes
 - Public sanitized sample data
@@ -130,11 +134,11 @@ bash scripts/run_splunk_local_checks.sh
 
 ## Demo Script Summary
 
-1. Show why AI-agent operations need observability.
-2. Show structured event capture.
-3. Show the Flight Recorder dashboard.
-4. Show risk, approval, and cost signals.
-5. Explain the evidence-bound AI investigation layer.
+1. Name the user: SRE, platform, security, and operations teams.
+2. Explain the problem: chat transcripts are not enough after a risky AI-agent run.
+3. Show the working Flight Recorder dashboard.
+4. Load events, filter risk and approvals, and run a Splunk-style search.
+5. Generate an evidence-bound AI investigation draft with cited event IDs.
 6. Explain the honest boundary: Splunk-ready artifacts are verified; live Splunk Cloud ingestion is not claimed yet.
 
 ## What Makes It Different

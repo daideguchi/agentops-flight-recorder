@@ -92,9 +92,11 @@ def build_case_cards(cases: list[dict[str, Any]]) -> str:
 def build_timeline(events: list[dict[str, Any]]) -> str:
     rows: list[str] = []
     for event in sorted(events, key=lambda row: row["timestamp"]):
+        risk_weight = RISK_WEIGHT[event["risk_level"]]
+        approval = "yes" if event.get("human_approval_required") else "no"
         rows.append(
             f"""
-            <article class="timeline-row">
+            <article class="timeline-row" data-risk-weight="{risk_weight}" data-approval="{approval}" data-case="{esc(event["case_id"])}">
               <div>
                 <span class="event-id">{esc(event["event_id"])}</span>
                 <span class="subtle">{esc(event["case_id"])}</span>
@@ -171,6 +173,55 @@ def build_spl_blocks() -> str:
     return "\n".join(cards)
 
 
+def build_judge_cards() -> str:
+    cards = [
+        (
+            "Who",
+            "SRE, platform, security, and operations teams that let AI agents touch tickets, tools, APIs, and release workflows.",
+        ),
+        (
+            "Pain",
+            "After a bad action, a chat transcript is not enough. Teams need to search what the agent did, where risk appeared, and who approved the next step.",
+        ),
+        (
+            "AI Use",
+            "The AI investigator is evidence-bound: it summarizes only from event IDs and SPL result rows, then asks a human to approve, reject, or hand off.",
+        ),
+        (
+            "Value",
+            "Agent work becomes Splunk-ready operational evidence instead of an unreviewable conversation.",
+        ),
+    ]
+    return "\n".join(
+        "\n".join(
+            [
+                '        <article class="judge-card">',
+                f"          <strong>{esc(title)}</strong>",
+                f"          <p>{esc(body)}</p>",
+                "        </article>",
+            ]
+        )
+        for title, body in cards
+    )
+
+
+def build_demo_events_json(events: list[dict[str, Any]]) -> str:
+    compact_events = [
+        {
+            "event_id": event["event_id"],
+            "case_id": event["case_id"],
+            "risk_level": event["risk_level"],
+            "status": event["status"],
+            "summary": event["summary"],
+            "decision": event.get("decision", "none"),
+            "approval": bool(event.get("human_approval_required")),
+            "cost": float(event.get("cost_usd_estimate", 0) or 0),
+        }
+        for event in events
+    ]
+    return json.dumps(compact_events, ensure_ascii=False)
+
+
 def build_html(events: list[dict[str, Any]]) -> str:
     cases = grouped_cases(events)
     actors = Counter(event["actor_type"] for event in events)
@@ -184,6 +235,8 @@ def build_html(events: list[dict[str, Any]]) -> str:
     approval_rows = build_approval_rows(events)
     timeline = build_timeline(events)
     spl_blocks = build_spl_blocks()
+    judge_cards = build_judge_cards()
+    demo_events_json = build_demo_events_json(events)
 
     return f"""<!doctype html>
 <html lang="en">
@@ -244,6 +297,35 @@ def build_html(events: list[dict[str, Any]]) -> str:
       display: grid;
       grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.75fr);
       gap: 24px;
+    }}
+
+    .judge-grid {{
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin: 14px 0 18px;
+    }}
+
+    .judge-card {{
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: 0 8px 20px rgba(20, 33, 43, 0.05);
+      min-height: 150px;
+    }}
+
+    .judge-card strong {{
+      display: block;
+      color: var(--brand);
+      font-size: 15px;
+      margin-bottom: 8px;
+    }}
+
+    .judge-card p {{
+      margin: 0;
+      color: var(--ink);
+      font-size: 14px;
     }}
 
     h1 {{
@@ -328,6 +410,74 @@ def build_html(events: list[dict[str, Any]]) -> str:
     .section {{
       margin-top: 22px;
       padding: 20px;
+    }}
+
+    .demo-runner {{
+      border: 2px solid rgba(11, 107, 79, 0.32);
+      background: #fbfefd;
+    }}
+
+    .control-row {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 10px 0 14px;
+    }}
+
+    .control-row button {{
+      appearance: none;
+      border: 1px solid var(--brand);
+      background: var(--brand);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      border-radius: 6px;
+      padding: 10px 14px;
+      cursor: pointer;
+    }}
+
+    .control-row button.secondary {{
+      color: var(--brand);
+      background: #fff;
+    }}
+
+    .demo-output {{
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      padding: 14px;
+    }}
+
+    .demo-output pre {{
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 0;
+      background: #101820;
+      color: #e7f5ef;
+      border-radius: 6px;
+      padding: 12px;
+      min-height: 170px;
+      max-height: 310px;
+      overflow: auto;
+      font-size: 13px;
+    }}
+
+    .ai-panel {{
+      border-left: 4px solid var(--brand);
+      padding-left: 14px;
+    }}
+
+    .ai-panel h3 {{
+      margin: 0 0 8px;
+      font-size: 18px;
+    }}
+
+    .ai-panel ul {{
+      margin: 8px 0 0;
+      padding-left: 20px;
     }}
 
     .case-grid {{
@@ -507,8 +657,13 @@ def build_html(events: list[dict[str, Any]]) -> str:
 
       .metrics,
       .case-grid,
+      .judge-grid,
       .spl-grid {{
         grid-template-columns: repeat(2, minmax(0, 1fr));
+      }}
+
+      .demo-output {{
+        grid-template-columns: 1fr;
       }}
 
       .timeline-row {{
@@ -527,6 +682,7 @@ def build_html(events: list[dict[str, Any]]) -> str:
 
       .metrics,
       .case-grid,
+      .judge-grid,
       .spl-grid {{
         grid-template-columns: 1fr;
       }}
@@ -545,10 +701,11 @@ def build_html(events: list[dict[str, Any]]) -> str:
 
     <section class="hero">
       <div>
-        <h1>Make AI-agent operations searchable, reviewable, and safe to resume.</h1>
+        <h1>Help ops teams investigate what AI agents actually did.</h1>
         <p class="hero-copy">
-          AgentOps Flight Recorder turns human, AI-agent, robot, and API actions into Splunk-ready evidence:
-          risk signals, cost signals, approvals, redactions, blocked actions, and handoff context.
+          AgentOps Flight Recorder is for SRE, platform, security, and operations teams that need
+          an audit trail when AI agents run tools. It turns agent actions into Splunk-ready evidence
+          and uses evidence-bound AI to explain the incident without inventing facts.
         </p>
       </div>
       <aside class="query-card">
@@ -558,12 +715,40 @@ def build_html(events: list[dict[str, Any]]) -> str:
       </aside>
     </section>
 
+    <section class="judge-grid" aria-label="Judge quick answer">
+      {judge_cards}
+    </section>
+
     <section class="metrics">
       <div class="metric"><strong>{len(events)}</strong><span>Splunk-ready AgentOps events</span></div>
       <div class="metric"><strong>{len(cases)}</strong><span>cases reconstructed from event trails</span></div>
       <div class="metric"><strong>{risk_count}</strong><span>medium/high/critical risk events</span></div>
       <div class="metric"><strong>{approval_count}</strong><span>human approval gates</span></div>
       <div class="metric"><strong>${total_cost:.2f}</strong><span>estimated model/tool spend in sample</span></div>
+    </section>
+
+    <section class="section demo-runner" id="demo-runner">
+      <h2>Run The Review Flow</h2>
+      <p>
+        This is the working prototype path: load event evidence, narrow to risk or approvals,
+        run a Splunk-style search, then generate an evidence-bound AI investigation draft.
+      </p>
+      <div class="control-row">
+        <button type="button" data-demo-filter="all">Load All Events</button>
+        <button type="button" data-demo-filter="risk">Show Risky Events</button>
+        <button type="button" data-demo-filter="approval">Show Approval Gates</button>
+        <button class="secondary" type="button" data-demo-spl>Run SPL Search</button>
+        <button class="secondary" type="button" data-demo-ai>Generate AI Summary</button>
+      </div>
+      <div class="demo-output">
+        <pre id="demo-query-output">index=agentops sourcetype="agentops:json"
+| sort 0 _time
+| table _time event.case_id event.event_id event.risk_level event.status event.summary</pre>
+        <div class="ai-panel" id="demo-ai-output">
+          <h3>Evidence-Bound AI Investigator</h3>
+          <p>Choose a filter or run the AI summary. The assistant is constrained to cite event IDs from the evidence trail.</p>
+        </div>
+      </div>
     </section>
 
     <section class="section">
@@ -613,6 +798,62 @@ def build_html(events: list[dict[str, Any]]) -> str:
       <div class="timeline">{timeline}</div>
     </section>
   </main>
+  <script>
+    const EVENTS = {demo_events_json};
+    const output = document.getElementById('demo-query-output');
+    const aiOutput = document.getElementById('demo-ai-output');
+    const timelineRows = [...document.querySelectorAll('.timeline-row')];
+
+    const visibleEvents = () => timelineRows
+      .filter((row) => row.style.display !== 'none')
+      .map((row) => row.querySelector('.event-id').textContent.trim());
+
+    function setTimelineFilter(mode) {{
+      let count = 0;
+      timelineRows.forEach((row) => {{
+        const riskWeight = Number(row.dataset.riskWeight || '0');
+        const approval = row.dataset.approval === 'yes';
+        const show = mode === 'all' || (mode === 'risk' && riskWeight >= 2) || (mode === 'approval' && approval);
+        row.style.display = show ? '' : 'none';
+        if (show) count += 1;
+      }});
+      const label = mode === 'all' ? 'all events' : mode === 'risk' ? 'medium/high/critical or blocked events' : 'approval gates';
+      output.textContent = `Loaded ${{count}} ${{label}} from the AgentOps event trail.\\n\\nVisible event IDs: ${{visibleEvents().join(', ')}}`;
+      aiOutput.innerHTML = `<h3>Evidence Filter Applied</h3><p>The review surface is now limited to <strong>${{label}}</strong>. Every row still carries a case ID and event ID for Splunk lookup.</p>`;
+    }}
+
+    function runSplSearch() {{
+      const risky = EVENTS.filter((event) => ['medium', 'high', 'critical'].includes(event.risk_level) || event.status === 'blocked');
+      output.textContent = `index=agentops sourcetype="agentops:json"\\n| search event.risk_level IN ("medium","high","critical") OR event.status="blocked"\\n| table _time event.case_id event.event_id event.risk_level event.status event.summary\\n\\nMatched rows: ${{risky.length}}\\nEvent IDs: ${{risky.map((event) => event.event_id).join(', ')}}`;
+      aiOutput.innerHTML = `<h3>SPL Search Result</h3><p>The same investigation can move into Splunk: the prototype already ships HEC-shaped JSON and saved SPL searches.</p>`;
+    }}
+
+    function generateAiSummary() {{
+      const risky = EVENTS.filter((event) => ['medium', 'high', 'critical'].includes(event.risk_level) || event.status === 'blocked');
+      const approvals = EVENTS.filter((event) => event.approval || event.decision !== 'none');
+      const cost = EVENTS.reduce((sum, event) => sum + Number(event.cost || 0), 0);
+      const riskIds = risky.map((event) => event.event_id).slice(0, 8);
+      const approvalIds = approvals.map((event) => event.event_id).slice(0, 8);
+      output.textContent = `AI prompt boundary:\\nUse only the AgentOps events visible in this case. Cite event IDs. Do not infer facts that are not in Splunk-searchable evidence.\\n\\nEvidence set: ${{EVENTS.length}} events, ${{risky.length}} risk/blocked rows, ${{approvals.length}} approval rows.`;
+      aiOutput.innerHTML = `
+        <h3>AI Investigation Draft</h3>
+        <p><strong>What happened:</strong> the agent session contains risky or blocked operational actions that need human review before continuation.</p>
+        <ul>
+          <li><strong>Risk evidence:</strong> ${{riskIds.join(', ')}}</li>
+          <li><strong>Approval evidence:</strong> ${{approvalIds.join(', ')}}</li>
+          <li><strong>Cost signal:</strong> estimated model/tool spend is $${{cost.toFixed(2)}} across the sample trail.</li>
+          <li><strong>Next safe action:</strong> human reviewer should approve, reject, or hand off using the cited event IDs.</li>
+        </ul>
+        <p>No unsupported claim is included because every sentence must map back to an event row.</p>
+      `;
+    }}
+
+    document.querySelectorAll('[data-demo-filter]').forEach((button) => {{
+      button.addEventListener('click', () => setTimelineFilter(button.dataset.demoFilter));
+    }});
+    document.querySelector('[data-demo-spl]').addEventListener('click', runSplSearch);
+    document.querySelector('[data-demo-ai]').addEventListener('click', generateAiSummary);
+  </script>
 </body>
 </html>
 """
